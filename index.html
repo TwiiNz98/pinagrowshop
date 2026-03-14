@@ -1,324 +1,317 @@
-// 2, 4 & 6. Base de datos con subcategorías y productos exigidos y sus imágenes
-let db = JSON.parse(localStorage.getItem('pinaGrowLightDB')) || {
-    productos: [
-        { id: 1, nombre: "Bong", precio: 19000, img: "https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=400", cat: "Smoke", subcat: "Pipas", desc: "Equipa tu sesión con la mejor calidad. Este Bong ha sido seleccionado por expertos cultivadores para garantizar durabilidad, eficiencia y un diseño impecable. Perfecto para quienes buscan llevar su experiencia al siguiente nivel con total estilo." },
-        { id: 2, nombre: "Papel", precio: 20000, img: "https://images.unsplash.com/photo-1626379616459-b2ce1d9decbc?q=80&w=400", cat: "Smoke", subcat: "Papelillos", desc: "Combustión lenta y natural sin aditivos químicos. Diseñados para disfrutar el sabor real de tu hierba con total suavidad." },
-        { id: 3, nombre: "Filtros", precio: 12390, img: "https://images.unsplash.com/photo-1528821128474-27f963b062bf?q=80&w=400", cat: "Smoke", subcat: "Filtros", desc: "Filtros de alta retención para una experiencia suave. Protegen tus pulmones sin alterar el flujo ni el sabor." },
-        { id: 4, nombre: "Luces", precio: 15550, img: "https://images.unsplash.com/photo-1563461660947-507ef49e9c47?q=80&w=400", cat: "Cultivo", subcat: "Luces LED", desc: "Iluminación Full Spectrum de alta eficiencia energética para potenciar la fotosíntesis y maximizar tus cosechas indoor." },
-        { id: 5, nombre: "Pipa", precio: 20000, img: "https://images.unsplash.com/photo-1603588265004-94025b6422ce?q=80&w=400", cat: "Smoke", subcat: "Pipas", desc: "Diseño ergonómico y portátil para cualquier ocasión. Cristal borosilicato resistente al calor para un humo limpio." },
-        { id: 6, nombre: "Moledor", precio: 30000, img: "https://images.unsplash.com/photo-1589218482020-ad1642a4208c?q=80&w=400", cat: "Smoke", subcat: "Pipas", desc: "Triturado perfecto y uniforme gracias a sus dientes de diamante afilados. Aluminio aeroespacial para durabilidad extrema." },
-        { id: 7, nombre: "Vaper", precio: 100200, img: "https://images.unsplash.com/photo-1536881734914-725d25950d44?q=80&w=400", cat: "Tabaquería", subcat: "Encendedores", desc: "Control de temperatura preciso para grandes nubes de vapor. Tecnología de convección que calienta la hierba sin quemarla." }
-    ],
-    carrito: []
-};
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piña GrowShop | Experiencia Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
 
-/* ---- +18 Gate ---- */
-const gate = document.getElementById('gate');
-const body = document.body;
+    <div class="blobs-container">
+        <div class="blob blob-green"></div>
+        <div class="blob blob-yellow"></div>
+        <div class="blob blob-lime"></div>
+    </div>
 
-// Revisar sesión guardada
-if (sessionStorage.getItem('pg_age_ok') === '1') {
-    gate.classList.add('gate-hidden');
-} else {
-    body.style.overflow = 'hidden';
-}
+    <!-- ===== +18 GATE ===== -->
+    <div class="gate-overlay" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+      <div class="gate-box">
+        <img class="gate-logo" src="https://pinagrowshop.cl/img/PNG/pina-circular.png"
+             alt="Logo Piña GrowShop" loading="eager" />
+        <h2 id="gate-title">Verificación de edad</h2>
+        <p>Para ingresar a Piña GrowShop debes ser mayor de 18 años. ¿Confirmas que eres mayor de edad?</p>
+        <div class="gate-btns">
+          <button class="gate-yes" id="gate-yes" aria-label="Soy mayor de 18 años, ingresar">
+            Sí, tengo +18
+          </button>
+          <button class="gate-no"  id="gate-no"  aria-label="No soy mayor de 18, salir">
+            No
+          </button>
+        </div>
+      </div>
+    </div>
 
-document.getElementById('gate-yes').addEventListener('click', () => {
-    gate.classList.add('gate-hidden');
-    body.style.overflow = '';
-    sessionStorage.setItem('pg_age_ok', '1');
-    // Al ingresar, aseguramos que la vista sea idéntica al 'Inicio' del menú
-    if (typeof showSection === 'function') showSection('inicio');
-    window.location.hash = '#inicio';
-});
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker-item">🍍 ¡OFERTAS EXCLUSIVAS! — ENVÍOS A TODO CHILE — SAN MARCOS 1801, PADRE HURTADO — ASESORÍA EXPERTA 🍍</div>
+            <div class="ticker-item">🍍 ¡OFERTAS EXCLUSIVAS! — ENVÍOS A TODO CHILE — SAN MARCOS 1801, PADRE HURTADO — ASESORÍA EXPERTA 🍍</div>
+        </div>
+    </div>
 
-document.getElementById('gate-no').addEventListener('click', () => {
-    window.location.href = 'https://www.google.com';
-});
+    <div class="top-logo-wrapper">
+        <div class="pina-logo-main">🍍</div>
+    </div>
 
-// --- SUBCATEGORÍAS DINÁMICAS ---
+    <header>
+        <nav class="navbar">
+            <div class="siren-light"></div>
+            <div class="mobile-menu-icon" onclick="toggleMobileMenu()">☰</div>
+            
+            <ul class="nav-links" id="main-nav-links">
+                <li><a href="#inicio" onclick="showSection('inicio'); return false;">Inicio</a></li>
+                <li><a href="#productos" onclick="showSection('productos'); return false;">Tienda</a></li>
+                <li><a href="#contacto" onclick="showSection('contacto'); return false;">Ubicación</a></li>
+            </ul>
 
-// --- SUBCATEGORÍAS DINÁMICAS ---
-const subcategorias = {
-    "Todos": ["Todos"],
-    "Smoke": ["Todos", "Pipas", "Papelillos", "Filtros"],
-    "Cultivo": ["Todos", "Macetas", "Fertilizantes", "Luces LED"],
-    "Tabaquería": ["Todos", "Tabacos", "Cigarreras", "Encendedores"],
-    "Aromas": ["Todos", "Inciensos", "Aromatizantes", "Difusores"]
-};
+            <div class="search-container">
+                <input type="text" id="global-search" placeholder="Busca tu producto..." onkeyup="liveSearch()">
+                <span class="search-icon">🔍</span>
+            </div>
 
-function updateSubcats() {
-    const cat = document.getElementById('filter-cat').value;
-    const subcatSelect = document.getElementById('filter-subcat');
-    subcatSelect.innerHTML = subcategorias[cat].map(s => `<option value="${s}">${s}</option>`).join('');
-}
-
-// Inicializar subcategorías
-updateSubcats();
-
-// --- SISTEMA AVANZADO DE FILTROS Y ORDEN ---
-function applyFilters() {
-    let res = [...db.productos];
-    const cat = document.getElementById('filter-cat').value;
-    const subcat = document.getElementById('filter-subcat').value;
-    const sortP = document.getElementById('sort-price').value;
-    const sortA = document.getElementById('sort-alpha').value;
-
-    if(cat !== 'Todos') res = res.filter(p => p.cat === cat);
-    if(subcat !== 'Todos') res = res.filter(p => p.subcat === subcat);
-
-    if(sortP === 'asc') res.sort((a,b) => a.precio - b.precio);
-    if(sortP === 'desc') res.sort((a,b) => b.precio - a.precio);
-
-    if(sortA === 'az') res.sort((a,b) => a.nombre.localeCompare(b.nombre));
-    if(sortA === 'za') res.sort((a,b) => b.nombre.localeCompare(a.nombre));
-
-    renderProducts(res);
-}
-
-function liveSearch() {
-    const term = document.getElementById('global-search').value.toLowerCase();
-    const filtered = db.productos.filter(p => p.nombre.toLowerCase().includes(term));
-    renderProducts(filtered);
-    if (term !== "") showSection('productos');
-}
-
-// --- RENDERIZADO DE TIENDA ---
-function renderProducts(data = db.productos) {
-    const grid = document.getElementById('product-grid');
-    grid.innerHTML = data.map(p => `
-        <div class="product-card">
-            <img src="${p.img}" alt="${p.nombre}" class="img">
-            <div class="product-info">
-                <div>
-                    <p class="prod-subcat">${p.subcat}</p>
-                    <h3 class="prod-name fredoka-title text-dark">${p.nombre}</h3>
-                    <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.desc}</p>
+            <div class="nav-actions">
+                <div class="cart-wrapper" onclick="toggleCart()">
+                    <span class="cart-emoji-icon">🛒</span>
+                    <span id="cart-count" class="cart-badge">0</span>
                 </div>
-                <div>
-                    <div class="prod-price">$${p.precio.toLocaleString('es-CL')}</div>
-                    <button class="btn-outline full-width" onclick="openModal(${p.id})">Ver Producto</button>
-                    <button class="btn-green-glow full-width" onclick="addToCart(${p.id}, 1)">Añadir</button>
+                <button class="admin-btn-emoji" onclick="checkAdminPassword()">⚙️</button>
+            </div>
+        </nav>
+    </header>
+
+    <main id="content">
+        <section id="inicio" class="page-section">
+            <div class="hero-container text-center">
+                <h1 id="txt-hero-titulo" class="fredoka-title text-dark">Lleva tu cultivo al <br><span class="text-lime-dark">siguiente nivel</span></h1>
+                <p id="txt-hero-sub" class="hero-subtitle text-muted">Venta de Parafernalia, Productos de Cultivo y Tabaquería.</p>
+                <button class="btn-green-glow large-btn" onclick="showSection('productos')">EXPLORAR CATÁLOGO</button>
+            </div>
+        </section>
+
+        <section id="productos" class="page-section" style="display:none;">
+            <div class="container">
+                <h2 class="section-title fredoka-title text-center text-dark">Nuestros Productos</h2>
+                
+                <div class="filters-dashboard glass-light">
+                    <div class="filter-group">
+                        <label>Categoría:</label>
+                        <select id="filter-cat" onchange="updateSubcats(); applyFilters();">
+                            <option value="Todos">Todas las categorías</option>
+                            <option value="Smoke">Smoke</option>
+                            <option value="Cultivo">Cultivo</option>
+                            <option value="Tabaquería">Tabaquería</option>
+                            <option value="Aromas">Aromas</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Subcategoría:</label>
+                        <select id="filter-subcat" onchange="applyFilters()">
+                            <option value="Todos">Todos</option>
+                            </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Precio:</label>
+                        <select id="sort-price" onchange="applyFilters()">
+                            <option value="none">Todos</option>
+                            <option value="asc">Menor a mayor</option>
+                            <option value="desc">Mayor a menor</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Orden:</label>
+                        <select id="sort-alpha" onchange="applyFilters()">
+                            <option value="none">Todos</option>
+                            <option value="az">A-Z</option>
+                            <option value="za">Z-A</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="product-grid" class="product-grid"></div>
+            </div>
+        </section>
+
+        <section id="inicio-reviews" class="page-section container overflow-hidden">
+            <h2 class="section-title fredoka-title text-center text-dark">La voz de la <span class="text-lime-dark">Comunidad</span></h2>
+            <div class="reviews-slider-container">
+                <div class="reviews-track" id="reviews-track">
+                    <div class="review-card glass-translucent">
+                        <div class="review-header">
+                            <div class="rev-avatar">C</div>
+                            <div>
+                                <h4 class="text-dark font-bold">Carlos M.</h4>
+                                <span class="stars">⭐⭐⭐⭐⭐</span>
+                            </div>
+                        </div>
+                        <p class="text-muted">"Excelente atención, resolvieron todas mis dudas de cultivo. Los mejores de Padre Hurtado sin duda."</p>
+                        <button class="btn-innovative">Ver en Google</button>
+                    </div>
+                    <div class="review-card glass-translucent">
+                        <div class="review-header">
+                            <div class="rev-avatar">A</div>
+                            <div>
+                                <h4 class="text-dark font-bold">Andrea S.</h4>
+                                <span class="stars">⭐⭐⭐⭐⭐</span>
+                            </div>
+                        </div>
+                        <p class="text-muted">"Tienen de todo en tabaquería y parafernalia. El lugar es increíble y súper limpio. Recomendadísimo."</p>
+                        <button class="btn-innovative">Ver en Google</button>
+                    </div>
+                    <div class="review-card glass-translucent">
+                        <div class="review-header">
+                            <div class="rev-avatar">F</div>
+                            <div>
+                                <h4 class="text-dark font-bold">Felipe R.</h4>
+                                <span class="stars">⭐⭐⭐⭐⭐</span>
+                            </div>
+                        </div>
+                        <p class="text-muted">"Compré mis luces LED aquí y me asesoraron en todo el proceso. Muy profesionales."</p>
+                        <button class="btn-innovative">Ver en Google</button>
+                    </div>
+                    <div class="review-card glass-translucent">
+                        <div class="review-header">
+                            <div class="rev-avatar">V</div>
+                            <div>
+                                <h4 class="text-dark font-bold">Valeria P.</h4>
+                                <span class="stars">⭐⭐⭐⭐⭐</span>
+                            </div>
+                        </div>
+                        <p class="text-muted">"Me encantan los inciensos que venden. Siempre vuelvo por más, la atención del chico es un 10."</p>
+                        <button class="btn-innovative">Ver en Google</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="contacto" class="page-section container">
+            <h2 class="section-title fredoka-title text-center text-dark">Ubicación</h2>
+            <div class="map-container glass-light">
+                <iframe src="https://www.google.com/maps?q=San+Marcos+1801+Padre+Hurtado&output=embed" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </section>
+
+        <section id="servicios" class="page-section container">
+            <h2 class="section-title fredoka-title text-center text-dark">Servicios</h2>
+            <p class="text-muted text-center" style="max-width: 700px; margin: 0 auto 30px;">Te ofrecemos atención personalizada y soluciones completas: desde asesoría de cultivo hasta pedidos por encargo y métodos de pago cómodos.</p>
+            <div class="services-grid">
+                <div class="service-card glass-light">
+                    <div class="service-icon">💬</div>
+                    <h3 class="text-dark font-bold">Asesoría personalizada</h3>
+                    <p class="text-muted">Te guiamos paso a paso según tu nivel y tu espacio de cultivo.</p>
+                </div>
+                <div class="service-card glass-light">
+                    <div class="service-icon">📦</div>
+                    <h3 class="text-dark font-bold">Pedidos por encargo</h3>
+                    <p class="text-muted">Si buscas algo específico, lo traemos para ti sin vueltas.</p>
+                </div>
+                <div class="service-card glass-light">
+                    <div class="service-icon">🏧</div>
+                    <h3 class="text-dark font-bold">CajaVecina en tienda</h3>
+                    <p class="text-muted">Retira dinero y paga cuentas mientras compras tus productos.</p>
+                </div>
+                <div class="service-card glass-light">
+                    <div class="service-icon">📱</div>
+                    <h3 class="text-dark font-bold">Atención por WhatsApp</h3>
+                    <p class="text-muted">Escríbenos al +56 9 4580 2810 y te ayudamos al instante.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="product-modal" class="product-modal-overlay">
+        <div class="product-modal-content glass-light">
+            <button class="btn-close-naked text-dark" onclick="closeModal()">✕</button>
+            <div class="modal-grid">
+                <div class="modal-img-box">
+                    <img id="modal-img" src="" alt="Producto">
+                </div>
+                <div class="modal-info">
+                    <span id="modal-cat" class="cat-badge">Categoría</span>
+                    <h2 id="modal-name" class="fredoka-title text-dark">Nombre</h2>
+                    <p id="modal-desc" class="text-muted">Descripción detallada.</p>
+                    <div class="modal-price fredoka-title text-lime-dark" id="modal-price">$0</div>
+                    
+                    <div class="modal-actions">
+                        <div class="qty-selector">
+                            <button onclick="changeQty(-1)">-</button>
+                            <span id="modal-qty">1</span>
+                            <button onclick="changeQty(1)">+</button>
+                        </div>
+                        <button class="btn-green-glow full-width" id="btn-modal-add">AÑADIR AL CARRO</button>
+                    </div>
                 </div>
             </div>
         </div>
-    `).join('');
-    updateAdminList();
-    localStorage.setItem('pinaGrowLightDB', JSON.stringify(db));
-}
+    </div>
 
-// --- MODAL DE PRODUCTO (3) ---
-let currentModalItem = null;
-let modalQty = 1;
-
-function openModal(id) {
-    currentModalItem = db.productos.find(p => p.id === id);
-    modalQty = 1;
-    document.getElementById('modal-img').src = currentModalItem.img;
-    document.getElementById('modal-cat').innerText = currentModalItem.cat + " / " + currentModalItem.subcat;
-    document.getElementById('modal-name').innerText = currentModalItem.nombre;
-    document.getElementById('modal-desc').innerText = currentModalItem.desc;
-    document.getElementById('modal-price').innerText = `$${currentModalItem.precio.toLocaleString('es-CL')}`;
-    document.getElementById('modal-qty').innerText = modalQty;
-    
-    document.getElementById('btn-modal-add').onclick = () => {
-        addToCart(currentModalItem.id, modalQty);
-        closeModal();
-    };
-
-    document.getElementById('product-modal').style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('product-modal').style.display = 'none';
-}
-
-function changeQty(val) {
-    modalQty += val;
-    if (modalQty < 1) modalQty = 1;
-    document.getElementById('modal-qty').innerText = modalQty;
-}
-
-// --- CARRITO ---
-function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); }
-
-function addToCart(id, qty = 1) {
-    const prod = db.productos.find(p => p.id === id);
-    for(let i=0; i<qty; i++) { db.carrito.push(prod); }
-    updateCartUI();
-    showToast(`🍍 ${qty}x ${prod.nombre} añadido`);
-}
-
-function updateCartUI() {
-    const cont = document.getElementById('cart-items');
-    let subtotal = 0;
-    cont.innerHTML = db.carrito.map((item, index) => {
-        subtotal += item.precio;
-        return `
-        <div class="cart-item">
-            <div>
-                <strong class="text-dark" style="display:block; font-size:0.95rem;">${item.nombre}</strong>
-                <span class="text-lime-dark font-bold">$${item.precio.toLocaleString('es-CL')}</span>
-            </div>
-            <button onclick="removeFromCart(${index})" class="btn-close-naked" style="font-size:1.2rem;">✕</button>
-        </div>`;
-    }).join('');
-
-    document.getElementById('cart-count').innerText = db.carrito.length;
-    document.getElementById('cart-total').innerText = `$${subtotal.toLocaleString('es-CL')}`;
-}
-
-function removeFromCart(index) {
-    db.carrito.splice(index, 1);
-    updateCartUI();
-}
-
-function checkout() {
-    if (db.carrito.length === 0) return alert("Tu carro está vacío.");
-    let msg = `¡Hola Piña GrowShop! 🍍 Quiero pedir lo siguiente:\n\n`;
-    db.carrito.forEach(p => msg += `- ${p.nombre}\n`);
-    msg += `\nTotal a pagar: ${document.getElementById('cart-total').innerText}\n\n¿Tienen stock disponible?`;
-    window.open(`https://wa.me/56945802810?text=${encodeURIComponent(msg)}`, '_blank');
-}
-
-// --- UTILIDADES ---
-function showSection(id) {
-    document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
-
-    // Inicio usa dos secciones (hero + reseñas) para que coincida con la vista inicial después del gate.
-    if (id === 'inicio') {
-        document.getElementById('inicio').style.display = 'block';
-        const reviews = document.getElementById('inicio-reviews');
-        if (reviews) reviews.style.display = 'block';
-    } else {
-        document.getElementById(id).style.display = 'block';
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// Tecla Inicio (Home) vuelve a la sección inicio
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Home') {
-        showSection('inicio');
-        window.location.hash = '#inicio';
-    }
-});
-
-function toggleMobileMenu() {
-    document.getElementById('main-nav-links').classList.toggle('active');
-}
-
-function showToast(msg) {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = 'toast-msg';
-    toast.innerText = msg;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
-
-// --- ADMIN ---
-function checkAdminPassword() {
-    if (sessionStorage.getItem('adminAuth') === '1') {
-        document.getElementById('admin-panel').style.display = 'flex';
-        showToast("✅ Bienvenido de nuevo, administrador.");
-        return;
-    }
-
-    const pass = prompt("Ingrese contraseña de administrador:");
-    if (pass === null) return; // usuario canceló
-
-    if (pass === "Pineapple420") {
-        sessionStorage.setItem('adminAuth', '1');
-        document.getElementById('admin-panel').style.display = 'flex';
-        showToast("✅ Bienvenido, administrador.");
-    } else {
-        showToast("❌ Contraseña incorrecta");
-    }
-}
-
-function toggleAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-
-function addProduct() {
-    const nom = document.getElementById('p-nombre').value;
-    const pre = document.getElementById('p-precio').value;
-    const cat = document.getElementById('p-cat').value;
-    const img = document.getElementById('p-img').value || "https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=400";
-
-    if (nom && pre) {
-        db.productos.push({ id: Date.now(), nombre: nom, precio: parseInt(pre), cat: cat, subcat: "General", img: img, desc: "Nuevo producto añadido a Piña GrowShop." });
-        applyFilters();
-        showToast("✅ Producto Guardado");
-    }
-}
-
-function updateAdminList() {
-    document.getElementById('admin-list').innerHTML = db.productos.map(p => `
-        <div>
-            <span class="text-dark">${p.nombre}</span>
-            <button class="btn-delete" onclick="deleteProduct(${p.id})">Borrar</button>
+    <div id="cart-sidebar" class="cart-sidebar glass-light">
+        <div class="cart-header">
+            <h3 class="fredoka-title text-dark">Tu Orden</h3>
+            <button class="btn-close-naked text-dark" onclick="toggleCart()">✕</button>
         </div>
-    `).join('');
-}
+        <div id="cart-items" class="cart-items-container"></div>
+        <div class="cart-footer">
+            <div class="total-row fredoka-title text-lime-dark">Total: <span id="cart-total">$0</span></div>
+            <button class="btn-green-glow full-width" onclick="checkout()">PEDIR POR WHATSAPP</button>
+        </div>
+    </div>
 
-function deleteProduct(id) {
-    db.productos = db.productos.filter(p => p.id !== id);
-    applyFilters();
-}
+    <div id="admin-panel" class="admin-overlay" role="dialog" aria-modal="true" aria-label="Panel de administración">
+        <div class="admin-modal glass-light">
+            <div class="cart-header">
+                <h2 class="fredoka-title text-dark">Panel de Control</h2>
+                <button class="btn-close-naked text-dark" onclick="toggleAdmin()">✕</button>
+            </div>
+            <div class="admin-body">
+                <div class="admin-form">
+                    <p class="text-muted" style="font-size:0.9rem; margin-bottom:10px;">Agrega productos rápido y revisa el inventario en línea.</p>
+                    <input type="text" id="p-nombre" class="input-light" placeholder="Nombre del producto">
+                    <input type="number" id="p-precio" class="input-light" placeholder="Precio ($)">
+                    <select id="p-cat" class="input-light">
+                        <option value="Smoke">Smoke</option>
+                        <option value="Cultivo">Cultivo</option>
+                        <option value="Tabaquería">Tabaquería</option>
+                        <option value="Aromas">Aromas</option>
+                    </select>
+                    <input type="text" id="p-img" class="input-light" placeholder="URL de imagen">
+                    <button class="btn-green-glow full-width" onclick="addProduct()" style="margin-top: 15px;">AÑADIR PRODUCTO</button>
+                </div>
+                <div id="admin-list" class="admin-list"></div>
+            </div>
+        </div>
+    </div>
 
-// Inicializar
-renderProducts();
-updateCartUI();
+    <footer class="footer-area glass-light">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4 class="fredoka-title text-dark">Información</h4>
+                <p class="text-muted">"Venta de Parafernalia, Productos de Cultivo, Tabaquería y Mucho más"</p>
+                <div class="payment-methods">
+                    <h5 class="text-dark font-bold">Métodos de pago</h5>
+                    <p class="text-muted">💳 Débito/Crédito | 🏦 Transferencia</p>
+                </div>
+                <p class="copyright text-muted mt-20">© 2026 Todos los derechos reservados por PIÑA GROWSHOP</p>
+                <div class="footer-credit">Designed by TwiiNz</div>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="fredoka-title text-dark">Contactos</h4>
+                <ul class="text-muted footer-links">
+                    <li>📞 <a href="tel:+56945802810" class="hover-lime">+56 9 4580 2810</a></li>
+                    <li>🍍 PiñaGrowShop Facebook</li>
+                    <li>📍 San Marcos 1801, Padre Hurtado.</li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4 class="fredoka-title text-dark">Instagram</h4>
+                <ul class="text-muted footer-links">
+                    <li><a href="https://www.instagram.com/pinagrowshop/" class="hover-lime" target="_blank">@pinagrowshop</a></li>
+                    <li>🌱 Cultivo | Sustrato | Semilla</li>
+                    <li>👽 Parafernalia | Bongs | Pipas</li>
+                    <li>💨 Vaporizadores | Tabaco</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
 
-// --- RESEÑAS: AUTO-LOOP POR HOVER LATERAL ---
-function initReviewHoverScroll() {
-    const container = document.querySelector('.reviews-slider-container');
-    const track = document.getElementById('reviews-track');
-    if (!container || !track) return;
+    <a href="https://wa.me/56945802810" class="whatsapp-float" target="_blank">
+        <img src="https://img.icons8.com/fluency/96/whatsapp.png" alt="WhatsApp">
+    </a>
+    <div id="toast-container" class="toast-container"></div>
 
-    // Duplicar contenido para bucle infinito.
-    const originalCards = Array.from(track.children);
-    const cloneA = track.cloneNode(true);
-    const cloneB = track.cloneNode(true);
-
-    track.append(...cloneA.children);
-    track.append(...cloneB.children);
-
-    const baseWidth = track.scrollWidth / 3; // ancho de un bloque (original)
-
-    const baseVelocity = 1.5; // velocidad base hacia la izquierda
-    let velocity = baseVelocity;
-    let rafId = null;
-
-    function normalizeScroll() {
-        if (container.scrollLeft >= baseWidth * 2) {
-            container.scrollLeft -= baseWidth;
-        } else if (container.scrollLeft <= 0) {
-            container.scrollLeft += baseWidth;
-        }
-    }
-
-    function frame() {
-        if (velocity !== 0) {
-            container.scrollLeft += velocity;
-            normalizeScroll();
-        }
-        rafId = requestAnimationFrame(frame);
-    }
-
-    function stopMotion() {
-        velocity = 0;
-    }
-
-    container.addEventListener('mouseenter', stopMotion);
-    container.addEventListener('mouseleave', () => { velocity = baseVelocity; });
-
-    // Iniciar el bucle (siempre deberíamos estar moviéndonos)
-    frame();
-
-    // Establecer posición de inicio en el bloque medio
-    container.scrollLeft = baseWidth;
-}
-
-initReviewHoverScroll();
+    <script src="app.js"></script>
+</body>
+</html>
