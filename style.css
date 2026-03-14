@@ -213,6 +213,10 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg-main); color: var
 .product-modal-content { width: 90%; max-width: 800px; padding: 40px; position: relative; border-radius: 25px; }
 .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
 .modal-img-box img { width: 100%; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.modal-thumbs { display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; }
+.modal-thumbs img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+.modal-thumbs img:hover { border-color: var(--lime-dark); }
+.modal-thumbs img.active { border-color: var(--lime-fluor); }
 .cat-badge { background: rgba(174, 230, 0, 0.2); color: var(--lime-dark); padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; }
 .modal-price { font-size: 2.5rem; margin: 20px 0; }
 .qty-selector { display: flex; align-items: center; gap: 15px; background: #f0f0f0; padding: 5px 20px; border-radius: 50px; margin-bottom: 20px; width: max-content; }
