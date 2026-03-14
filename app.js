@@ -197,14 +197,6 @@ function showSection(id) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Tecla Inicio (Home) vuelve a la sección inicio
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Home') {
-        showSection('inicio');
-        window.location.hash = '#inicio';
-    }
-});
-
 function toggleMobileMenu() {
     document.getElementById('main-nav-links').classList.toggle('active');
 }
@@ -219,25 +211,7 @@ function showToast(msg) {
 }
 
 // --- ADMIN ---
-function checkAdminPassword() {
-    if (sessionStorage.getItem('adminAuth') === '1') {
-        document.getElementById('admin-panel').style.display = 'flex';
-        showToast("✅ Bienvenido de nuevo, administrador.");
-        return;
-    }
-
-    const pass = prompt("Ingrese contraseña de administrador:");
-    if (pass === null) return; // usuario canceló
-
-    if (pass === "Pineapple420") {
-        sessionStorage.setItem('adminAuth', '1');
-        document.getElementById('admin-panel').style.display = 'flex';
-        showToast("✅ Bienvenido, administrador.");
-    } else {
-        showToast("❌ Contraseña incorrecta");
-    }
-}
-
+function checkAdminPassword() { if (prompt("Clave:") === "Pineapple420") document.getElementById('admin-panel').style.display = 'flex'; }
 function toggleAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
 function addProduct() {
@@ -255,9 +229,9 @@ function addProduct() {
 
 function updateAdminList() {
     document.getElementById('admin-list').innerHTML = db.productos.map(p => `
-        <div>
+        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; margin-top:5px;">
             <span class="text-dark">${p.nombre}</span>
-            <button class="btn-delete" onclick="deleteProduct(${p.id})">Borrar</button>
+            <button onclick="deleteProduct(${p.id})" style="color:#ff3333; background:none; border:none; cursor:pointer; font-weight:800;">Borrar</button>
         </div>
     `).join('');
 }
@@ -287,8 +261,7 @@ function initReviewHoverScroll() {
 
     const baseWidth = track.scrollWidth / 3; // ancho de un bloque (original)
 
-    const baseVelocity = 1.5; // velocidad base hacia la izquierda
-    let velocity = baseVelocity;
+    let velocity = 0;
     let rafId = null;
 
     function normalizeScroll() {
@@ -307,15 +280,29 @@ function initReviewHoverScroll() {
         rafId = requestAnimationFrame(frame);
     }
 
+    function onMove(e) {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const edge = rect.width * 0.25;
+
+        if (x < edge) {
+            velocity = -4; // hacia la izquierda
+        } else if (x > rect.width - edge) {
+            velocity = 4; // hacia la derecha
+        } else {
+            velocity = 0;
+        }
+    }
+
     function stopMotion() {
         velocity = 0;
     }
 
-    container.addEventListener('mouseenter', stopMotion);
-    container.addEventListener('mouseleave', () => { velocity = baseVelocity; });
-
-    // Iniciar el bucle (siempre deberíamos estar moviéndonos)
-    frame();
+    container.addEventListener('mouseenter', () => {
+        if (!rafId) frame();
+    });
+    container.addEventListener('mouseleave', () => stopMotion());
+    container.addEventListener('mousemove', onMove);
 
     // Establecer posición de inicio en el bloque medio
     container.scrollLeft = baseWidth;
