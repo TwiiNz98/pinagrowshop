@@ -88,12 +88,12 @@ function renderProducts(data = db.productos) {
     const grid = document.getElementById('product-grid');
     grid.innerHTML = data.map(p => `
         <div class="product-card">
-            <img src="${p.img}" alt="${p.nombre}" class="img">
+            <img src="${getProductImages(p)[0]}" alt="${p.nombre}" class="img">
             <div class="product-info">
                 <div>
                     <p class="prod-subcat">${p.subcat}</p>
                     <h3 class="prod-name fredoka-title text-dark">${p.nombre}</h3>
-                    <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.desc}</p>
+                    <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.desc || ''}</p>
                 </div>
                 <div>
                     <div class="prod-price">$${p.precio.toLocaleString('es-CL')}</div>
@@ -114,10 +114,59 @@ let modalQty = 1;
 function openModal(id) {
     currentModalItem = db.productos.find(p => p.id === id);
     modalQty = 1;
-    document.getElementById('modal-img').src = currentModalItem.img;
+
+    const modalImg = document.getElementById('modal-img');
+    const thumbs = document.getElementById('modal-thumbs');
+
+    function renderThumbs(images) {
+        thumbs.innerHTML = images.map((src, idx) => `
+            <img src="${src}" class="${idx === 0 ? 'active' : ''}" draggable="true" data-index="${idx}" />
+        `).join('');
+
+        thumbs.querySelectorAll('img').forEach((imgEl, idx) => {
+            imgEl.addEventListener('click', () => {
+                modalImg.src = imgEl.src;
+                thumbs.querySelectorAll('img').forEach(i => i.classList.remove('active'));
+                imgEl.classList.add('active');
+            });
+
+            imgEl.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', String(idx));
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            imgEl.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            imgEl.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                const toIndex = idx;
+                if (isNaN(fromIndex) || fromIndex === toIndex) return;
+
+                const imagesArr = getProductImages(currentModalItem);
+                const [moved] = imagesArr.splice(fromIndex, 1);
+                imagesArr.splice(toIndex, 0, moved);
+
+                currentModalItem.imagenes = imagesArr;
+                currentModalItem.img = imagesArr[0];
+
+                renderThumbs(imagesArr);
+                modalImg.src = currentModalItem.img;
+            });
+        });
+    }
+
+    const images = getProductImages(currentModalItem);
+    modalImg.src = images[0];
+    modalImg.alt = currentModalItem.nombre;
+    renderThumbs(images);
+
     document.getElementById('modal-cat').innerText = currentModalItem.cat + " / " + currentModalItem.subcat;
     document.getElementById('modal-name').innerText = currentModalItem.nombre;
-    document.getElementById('modal-desc').innerText = currentModalItem.desc;
+    document.getElementById('modal-desc').innerText = currentModalItem.desc || '';
     document.getElementById('modal-price').innerText = `$${currentModalItem.precio.toLocaleString('es-CL')}`;
     document.getElementById('modal-qty').innerText = modalQty;
     
@@ -211,27 +260,143 @@ function showToast(msg) {
 }
 
 // --- ADMIN ---
-function checkAdminPassword() { if (prompt("Clave:") === "Pineapple420") document.getElementById('admin-panel').style.display = 'flex'; }
+let editingProductId = null;
+let adminFilesData = [];
+
+function readFilesAsDataURLs(files) {
+    const reads = Array.from(files)
+        .slice(0, 8)
+        .map(file => new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(file);
+        }));
+    return Promise.all(reads).then(results => results.filter(Boolean));
+}
+
+function handleAdminFilesChange(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+        adminFilesData = [];
+        return;
+    }
+    if (files.length > 8) {
+        showToast('⚠️ Solo se procesarán las primeras 8 imágenes.');
+    }
+    readFilesAsDataURLs(files).then(dataUrls => {
+        adminFilesData = dataUrls.slice(0, 8);
+        showToast(`✅ ${adminFilesData.length} imagen(es) lista(s)`);
+    });
+}
+
+function checkAdminPassword() {
+    if (prompt("Clave:") === "Pineapple420") {
+        resetAdminForm();
+        document.getElementById('admin-panel').style.display = 'flex';
+    }
+}
 function toggleAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
+function getProductImages(p) {
+    if (Array.isArray(p.imagenes) && p.imagenes.length) return p.imagenes.slice(0, 8);
+    if (typeof p.img === 'string' && p.img.trim()) return [p.img];
+    return ["https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=400"];
+}
+
+function resetAdminForm() {
+    editingProductId = null;
+    adminFilesData = [];
+    document.getElementById('p-nombre').value = '';
+    document.getElementById('p-precio').value = '';
+    document.getElementById('p-cat').value = 'Smoke';
+    document.getElementById('p-subcat').value = '';
+    document.getElementById('p-desc').value = '';
+    document.getElementById('p-imgs').value = '';
+    document.getElementById('p-files').value = '';
+    document.getElementById('admin-save-btn').innerText = 'AÑADIR PRODUCTO';
+}
+
+function loadProductToForm(id) {
+    const prod = db.productos.find(p => p.id === id);
+    if (!prod) return;
+
+    editingProductId = id;
+    adminFilesData = [];
+    document.getElementById('p-nombre').value = prod.nombre || '';
+    document.getElementById('p-precio').value = prod.precio || '';
+    document.getElementById('p-cat').value = prod.cat || 'Smoke';
+    document.getElementById('p-subcat').value = prod.subcat || '';
+    document.getElementById('p-desc').value = prod.desc || '';
+    document.getElementById('p-imgs').value = getProductImages(prod).join(', ');
+    document.getElementById('p-files').value = '';
+    document.getElementById('admin-save-btn').innerText = 'GUARDAR CAMBIOS';
+}
+
 function addProduct() {
-    const nom = document.getElementById('p-nombre').value;
+    const nom = document.getElementById('p-nombre').value.trim();
     const pre = document.getElementById('p-precio').value;
     const cat = document.getElementById('p-cat').value;
-    const img = document.getElementById('p-img').value || "https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=400";
+    const subcat = document.getElementById('p-subcat').value.trim() || 'General';
+    const desc = document.getElementById('p-desc').value.trim() || 'Nuevo producto añadido a Piña GrowShop.';
+    const urlImgs = document.getElementById('p-imgs').value
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
 
-    if (nom && pre) {
-        db.productos.push({ id: Date.now(), nombre: nom, precio: parseInt(pre), cat: cat, subcat: "General", img: img, desc: "Nuevo producto añadido a Piña GrowShop." });
-        applyFilters();
-        showToast("✅ Producto Guardado");
+    const totalImages = urlImgs.length + adminFilesData.length;
+    if (totalImages > 8) {
+        showToast('⚠️ Máximo 8 imágenes por producto. Se guardarán las primeras 8.');
     }
+
+    const imgs = [...urlImgs, ...adminFilesData].slice(0, 8);
+
+    if (!nom || !pre) {
+        showToast('⚠️ Completa nombre y precio.');
+        return;
+    }
+
+    const mainImg = imgs[0] || "https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=400";
+
+    if (editingProductId) {
+        const prod = db.productos.find(p => p.id === editingProductId);
+        if (!prod) return;
+
+        prod.nombre = nom;
+        prod.precio = parseInt(pre);
+        prod.cat = cat;
+        prod.subcat = subcat;
+        prod.desc = desc;
+        prod.imagenes = imgs.length ? imgs : [mainImg];
+        prod.img = mainImg;
+
+        showToast('✅ Producto actualizado');
+    } else {
+        db.productos.push({
+            id: Date.now(),
+            nombre: nom,
+            precio: parseInt(pre),
+            cat: cat,
+            subcat: subcat,
+            desc: desc,
+            imagenes: imgs.length ? imgs : [mainImg],
+            img: mainImg
+        });
+        showToast('✅ Producto agregado');
+    }
+
+    resetAdminForm();
+    applyFilters();
 }
 
 function updateAdminList() {
     document.getElementById('admin-list').innerHTML = db.productos.map(p => `
         <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; margin-top:5px;">
-            <span class="text-dark">${p.nombre}</span>
-            <button onclick="deleteProduct(${p.id})" style="color:#ff3333; background:none; border:none; cursor:pointer; font-weight:800;">Borrar</button>
+            <span class="text-dark" style="flex:1;">${p.nombre}</span>
+            <div style="display:flex; gap: 8px;">
+                <button onclick="loadProductToForm(${p.id})" style="color:#1a73e8; background:none; border:none; cursor:pointer; font-weight:800;">Editar</button>
+                <button onclick="deleteProduct(${p.id})" style="color:#ff3333; background:none; border:none; cursor:pointer; font-weight:800;">Borrar</button>
+            </div>
         </div>
     `).join('');
 }
