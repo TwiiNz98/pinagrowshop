@@ -216,6 +216,7 @@
             <div class="modal-grid">
                 <div class="modal-img-box">
                     <img id="modal-img" src="" alt="Producto">
+                    <div id="modal-thumbs" class="modal-thumbs"></div>
                 </div>
                 <div class="modal-info">
                     <span id="modal-cat" class="cat-badge">Categoría</span>
@@ -248,28 +249,29 @@
         </div>
     </div>
 
-    <div id="admin-panel" class="admin-overlay" role="dialog" aria-modal="true" aria-label="Panel de administración">
+    <div id="admin-panel" class="admin-overlay">
         <div class="admin-modal glass-light">
             <div class="cart-header">
                 <h2 class="fredoka-title text-dark">Panel de Control</h2>
                 <button class="btn-close-naked text-dark" onclick="toggleAdmin()">✕</button>
             </div>
-            <div class="admin-body">
-                <div class="admin-form">
-                    <p class="text-muted" style="font-size:0.9rem; margin-bottom:10px;">Agrega productos rápido y revisa el inventario en línea.</p>
-                    <input type="text" id="p-nombre" class="input-light" placeholder="Nombre del producto">
-                    <input type="number" id="p-precio" class="input-light" placeholder="Precio ($)">
-                    <select id="p-cat" class="input-light">
-                        <option value="Smoke">Smoke</option>
-                        <option value="Cultivo">Cultivo</option>
-                        <option value="Tabaquería">Tabaquería</option>
-                        <option value="Aromas">Aromas</option>
-                    </select>
-                    <input type="text" id="p-img" class="input-light" placeholder="URL de imagen">
-                    <button class="btn-green-glow full-width" onclick="addProduct()" style="margin-top: 15px;">AÑADIR PRODUCTO</button>
-                </div>
-                <div id="admin-list" class="admin-list"></div>
+            <div class="admin-form">
+                <input type="text" id="p-nombre" class="input-light" placeholder="Nombre Producto">
+                <input type="number" id="p-precio" class="input-light" placeholder="Precio ($)">
+                <select id="p-cat" class="input-light">
+                    <option value="Smoke">Smoke</option>
+                    <option value="Cultivo">Cultivo</option>
+                    <option value="Tabaquería">Tabaquería</option>
+                    <option value="Aromas">Aromas</option>
+                </select>
+                <input type="text" id="p-subcat" class="input-light" placeholder="Subcategoría">
+                <textarea id="p-desc" class="input-light" placeholder="Descripción del producto" rows="3" style="resize:none;"></textarea>
+                <textarea id="p-imgs" class="input-light" placeholder="URLs de imágenes (máximo 8), separadas por coma" rows="3" style="resize:none;"></textarea>
+                <input type="file" id="p-files" class="input-light" accept="image/*" multiple onchange="handleAdminFilesChange(event)">
+                <button id="admin-save-btn" class="btn-green-glow full-width" onclick="addProduct()" style="margin-top: 15px;">AÑADIR PRODUCTO</button>
+                <button class="btn-outline full-width" style="margin-top: 10px;" onclick="resetAdminForm()">LIMPIAR FORMULARIO</button>
             </div>
+            <div id="admin-list"></div>
         </div>
     </div>
 
@@ -283,7 +285,6 @@
                     <p class="text-muted">💳 Débito/Crédito | 🏦 Transferencia</p>
                 </div>
                 <p class="copyright text-muted mt-20">© 2026 Todos los derechos reservados por PIÑA GROWSHOP</p>
-                <div class="footer-credit">Designed by TwiiNz</div>
             </div>
             
             <div class="footer-col">
