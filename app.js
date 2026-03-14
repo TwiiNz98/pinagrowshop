@@ -219,7 +219,25 @@ function showToast(msg) {
 }
 
 // --- ADMIN ---
-function checkAdminPassword() { if (prompt("Clave:") === "Pineapple420") document.getElementById('admin-panel').style.display = 'flex'; }
+function checkAdminPassword() {
+    if (sessionStorage.getItem('adminAuth') === '1') {
+        document.getElementById('admin-panel').style.display = 'flex';
+        showToast("✅ Bienvenido de nuevo, administrador.");
+        return;
+    }
+
+    const pass = prompt("Ingrese contraseña de administrador:");
+    if (pass === null) return; // usuario canceló
+
+    if (pass === "Pineapple420") {
+        sessionStorage.setItem('adminAuth', '1');
+        document.getElementById('admin-panel').style.display = 'flex';
+        showToast("✅ Bienvenido, administrador.");
+    } else {
+        showToast("❌ Contraseña incorrecta");
+    }
+}
+
 function toggleAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
 function addProduct() {
@@ -237,9 +255,9 @@ function addProduct() {
 
 function updateAdminList() {
     document.getElementById('admin-list').innerHTML = db.productos.map(p => `
-        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; margin-top:5px;">
+        <div>
             <span class="text-dark">${p.nombre}</span>
-            <button onclick="deleteProduct(${p.id})" style="color:#ff3333; background:none; border:none; cursor:pointer; font-weight:800;">Borrar</button>
+            <button class="btn-delete" onclick="deleteProduct(${p.id})">Borrar</button>
         </div>
     `).join('');
 }
