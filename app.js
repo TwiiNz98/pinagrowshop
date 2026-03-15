@@ -391,7 +391,7 @@ function renderAdminList() {
 
     lista.innerHTML = `
         <h3 class="fredoka-title text-dark" style="margin:20px 0 10px;">
-            Productos en Firestore (${catalogoGlobal.length})
+            Productos en la Web (${catalogoGlobal.length})
         </h3>
         <div style="display:flex;flex-direction:column;gap:10px;">
             ${catalogoGlobal.map(p => {
