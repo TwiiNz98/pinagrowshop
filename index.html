@@ -306,15 +306,15 @@
                 <button class="btn-close-naked text-dark" onclick="toggleAdmin()">✕</button>
             </div>
             <div class="admin-form">
-                <input  type="text"   id="p-nombre" class="input-light" placeholder="Nombre Producto">
+                <input  type="text"   id="p-nombre" class="input-light" placeholder="Nombre del producto">
                 <input  type="number" id="p-precio" class="input-light" placeholder="Precio ($)">
-                <select id="p-cat"   class="input-light">
+                <select id="p-cat"   class="input-light" placeholder="Categoría">
                     <option value="Smoke">Smoke</option>
                     <option value="Cultivo">Cultivo</option>
                     <option value="Tabaquería">Tabaquería</option>
                     <option value="Aromas">Aromas</option>
                 </select>
-                <input    type="text" id="p-subcat" class="input-light" placeholder="Subcategoría">
+                <input    type="text" id="p-subcat" class="input-light" placeholder="Subcategoría (opcional)">
                 <textarea id="p-desc"  class="input-light" placeholder="Descripción del producto"       rows="3" style="resize:none;"></textarea>
                 <textarea id="p-imgs"  class="input-light" placeholder="URLs de imágenes (máx. 8), separadas por coma" rows="3" style="resize:none;"></textarea>
                 <input    type="file"  id="p-files" class="input-light" accept="image/*" multiple onchange="handleAdminFilesChange(event)">
