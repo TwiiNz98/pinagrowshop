@@ -49,7 +49,7 @@ function initApp() {
     // ── onSnapshot: escucha cambios en tiempo real ──
     onSnapshot(catalogoRef,
         (docSnap) => {
-            setFirebaseStatus("✅ Estado : Actualizado.", "green");
+            setFirebaseStatus("✅ Estado : Actualizado", "green");
 
             if (docSnap.exists()) {
                 const data = docSnap.data();
