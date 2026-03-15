@@ -6,6 +6,33 @@
     <title>Piña GrowShop | Experiencia Premium</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- ===== FIREBASE SDK v10 (Modular CDN) ===== -->
+    <script type="module">
+        import { initializeApp }         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, arrayUnion, arrayRemove, getDoc }
+                                         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey:            "AIzaSyB-At3w0mcAg7rQBE8gAkBH1hdInDd9Pbc",
+            authDomain:        "pina-growshop.firebaseapp.com",
+            projectId:         "pina-growshop",
+            storageBucket:     "pina-growshop.firebasestorage.app",
+            messagingSenderId: "136048074141",
+            appId:             "1:136048074141:web:f0a84efffec73128402374",
+            measurementId:     "G-FB3ZM9G9YB"
+        };
+
+        const app    = initializeApp(firebaseConfig);
+        const db     = getFirestore(app);
+
+        /* Exponer al scope global para que app.js pueda usarlos */
+        window.db_cloud  = db;
+        window.fb_methods = { doc, setDoc, onSnapshot, updateDoc, arrayUnion, arrayRemove, getDoc };
+
+        /* Disparar evento cuando Firebase esté listo */
+        window.dispatchEvent(new Event("firebase-ready"));
+    </script>
 </head>
 <body>
 
@@ -41,18 +68,21 @@
     </div>
 
     <div class="top-logo-wrapper">
-        <div class="pina-logo-main"><span class="logo-pina">Piña</span> <span class="logo-growshop">Growshop</span></div>
+        <div class="pina-logo-main">
+            <span class="logo-pina">Piña</span>
+            <span class="logo-growshop">Growshop</span>
+        </div>
     </div>
 
     <header>
         <nav class="navbar">
             <div class="siren-light"></div>
             <div class="mobile-menu-icon" onclick="toggleMobileMenu()">☰</div>
-            
+
             <ul class="nav-links" id="main-nav-links">
-                <li><a href="#inicio" onclick="showSection('inicio'); return false;">Inicio</a></li>
+                <li><a href="#inicio"    onclick="showSection('inicio');    return false;">Inicio</a></li>
                 <li><a href="#productos" onclick="showSection('productos'); return false;">Productos</a></li>
-                <li><a href="#contacto" onclick="showSection('contacto'); return false;">Tienda</a></li>
+                <li><a href="#contacto"  onclick="showSection('contacto');  return false;">Tienda</a></li>
             </ul>
 
             <div class="search-container">
@@ -71,18 +101,24 @@
     </header>
 
     <main id="content">
+        <!-- ===== INICIO ===== -->
         <section id="inicio" class="page-section">
             <div class="hero-container text-center">
-                <h1 id="txt-hero-titulo" class="fredoka-title text-dark">Lleva tu cultivo al <br><span class="text-lime-dark">siguiente nivel</span></h1>
-                <p id="txt-hero-sub" class="hero-subtitle text-muted">Venta de Parafernalia, Productos de Cultivo y Tabaquería.</p>
+                <h1 id="txt-hero-titulo" class="fredoka-title text-dark">
+                    Lleva tu cultivo al <br><span class="text-lime-dark">siguiente nivel</span>
+                </h1>
+                <p id="txt-hero-sub" class="hero-subtitle text-muted">
+                    Venta de Parafernalia, Productos de Cultivo y Tabaquería.
+                </p>
                 <button class="btn-green-glow large-btn" onclick="showSection('productos')">VER PRODUCTOS</button>
             </div>
         </section>
 
+        <!-- ===== PRODUCTOS ===== -->
         <section id="productos" class="page-section" style="display:none;">
             <div class="container">
                 <h2 class="section-title fredoka-title text-center text-dark">Nuestros Productos</h2>
-                
+
                 <div class="filters-dashboard glass-light">
                     <div class="filter-group">
                         <label>Categoría:</label>
@@ -98,7 +134,7 @@
                         <label>Subcategoría:</label>
                         <select id="filter-subcat" onchange="applyFilters()">
                             <option value="Todos">Todos</option>
-                            </select>
+                        </select>
                     </div>
                     <div class="filter-group">
                         <label>Precio:</label>
@@ -122,8 +158,11 @@
             </div>
         </section>
 
+        <!-- ===== REVIEWS ===== -->
         <section id="inicio-reviews" class="page-section container overflow-hidden">
-            <h2 class="section-title fredoka-title text-center text-dark">Valoraciones de la <span class="text-lime-dark">Comunidad</span></h2>
+            <h2 class="section-title fredoka-title text-center text-dark">
+                Valoraciones de la <span class="text-lime-dark">Comunidad</span>
+            </h2>
             <div class="reviews-slider-container">
                 <div class="reviews-track" id="reviews-track">
                     <div class="review-card glass-translucent">
@@ -150,20 +189,20 @@
                     </div>
                     <div class="review-card glass-translucent">
                         <div class="review-header">
-                            <div class="rev-avatar">F</div>
+                            <div class="rev-avatar">M</div>
                             <div>
-                                <h4 class="text-dark font-bold">Felipe R.</h4>
+                                <h4 class="text-dark font-bold">Miguel A.</h4>
                                 <span class="stars">⭐⭐⭐⭐⭐</span>
                             </div>
                         </div>
-                        <p class="text-muted">"Compré mis luces LED aquí y me asesoraron en todo el proceso. Muy profesionales."</p>
+                        <p class="text-muted">"Compré semillas y sustratos, todo de primera calidad. El trato es muy bueno y los precios justos."</p>
                         <button class="btn-innovative">Ver en Google</button>
                     </div>
                     <div class="review-card glass-translucent">
                         <div class="review-header">
                             <div class="rev-avatar">V</div>
                             <div>
-                                <h4 class="text-dark font-bold">Valeria P.</h4>
+                                <h4 class="text-dark font-bold">Valentina R.</h4>
                                 <span class="stars">⭐⭐⭐⭐⭐</span>
                             </div>
                         </div>
@@ -171,20 +210,27 @@
                         <button class="btn-innovative">Ver en Google</button>
                     </div>
                 </div>
-
             </div>
         </section>
 
+        <!-- ===== CONTACTO / MAPA ===== -->
         <section id="contacto" class="page-section container">
             <h2 class="section-title fredoka-title text-center text-dark">Ubicación</h2>
             <div class="map-container glass-light">
-                <iframe src="https://www.google.com/maps?q=San+Marcos+1801+Padre+Hurtado&output=embed" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <iframe
+                    src="https://www.google.com/maps?q=San+Marcos+1801+Padre+Hurtado&output=embed"
+                    width="100%" height="400" style="border:0;"
+                    allowfullscreen="" loading="lazy">
+                </iframe>
             </div>
         </section>
 
+        <!-- ===== SERVICIOS ===== -->
         <section id="servicios" class="page-section container">
             <h2 class="section-title fredoka-title text-center text-dark">Servicios</h2>
-            <p class="text-muted text-center" style="max-width: 700px; margin: 0 auto 30px;">El motivo por el cuál la gente nos prefiere resumido en cuatro pilares.</p>
+            <p class="text-muted text-center" style="max-width:700px;margin:0 auto 30px;">
+                El motivo por el cuál la gente nos prefiere resumido en cuatro pilares.
+            </p>
             <div class="services-grid">
                 <div class="service-card glass-light">
                     <div class="service-icon">💬</div>
@@ -210,6 +256,7 @@
         </section>
     </main>
 
+    <!-- ===== MODAL PRODUCTO ===== -->
     <div id="product-modal" class="product-modal-overlay">
         <div class="product-modal-content glass-light">
             <button class="btn-close-naked text-dark" onclick="closeModal()">✕</button>
@@ -219,11 +266,10 @@
                     <div id="modal-thumbs" class="modal-thumbs"></div>
                 </div>
                 <div class="modal-info">
-                    <span id="modal-cat" class="cat-badge">Categoría</span>
-                    <h2 id="modal-name" class="fredoka-title text-dark">Nombre</h2>
-                    <p id="modal-desc" class="text-muted">Descripción detallada.</p>
-                    <div class="modal-price fredoka-title text-lime-dark" id="modal-price">$0</div>
-                    
+                    <span id="modal-cat"   class="cat-badge">Categoría</span>
+                    <h2  id="modal-name"   class="fredoka-title text-dark">Nombre</h2>
+                    <p   id="modal-desc"   class="text-muted">Descripción detallada.</p>
+                    <div id="modal-price"  class="modal-price fredoka-title text-lime-dark">$0</div>
                     <div class="modal-actions">
                         <div class="qty-selector">
                             <button onclick="changeQty(-1)">-</button>
@@ -237,6 +283,7 @@
         </div>
     </div>
 
+    <!-- ===== CARRITO LATERAL ===== -->
     <div id="cart-sidebar" class="cart-sidebar glass-light">
         <div class="cart-header">
             <h3 class="fredoka-title text-dark">Carrito de Compras</h3>
@@ -244,11 +291,14 @@
         </div>
         <div id="cart-items" class="cart-items-container"></div>
         <div class="cart-footer">
-            <div class="total-row fredoka-title text-lime-dark">Total: <span id="cart-total">$0</span></div>
+            <div class="total-row fredoka-title text-lime-dark">
+                Total: <span id="cart-total">$0</span>
+            </div>
             <button class="btn-green-glow full-width" onclick="checkout()">CONTINUAR</button>
         </div>
     </div>
 
+    <!-- ===== PANEL ADMIN ===== -->
     <div id="admin-panel" class="admin-overlay">
         <div class="admin-modal glass-light">
             <div class="cart-header">
@@ -256,25 +306,32 @@
                 <button class="btn-close-naked text-dark" onclick="toggleAdmin()">✕</button>
             </div>
             <div class="admin-form">
-                <input type="text" id="p-nombre" class="input-light" placeholder="Nombre Producto">
-                <input type="number" id="p-precio" class="input-light" placeholder="Precio ($)">
-                <select id="p-cat" class="input-light">
+                <input  type="text"   id="p-nombre" class="input-light" placeholder="Nombre Producto">
+                <input  type="number" id="p-precio" class="input-light" placeholder="Precio ($)">
+                <select id="p-cat"   class="input-light">
                     <option value="Smoke">Smoke</option>
                     <option value="Cultivo">Cultivo</option>
                     <option value="Tabaquería">Tabaquería</option>
                     <option value="Aromas">Aromas</option>
                 </select>
-                <input type="text" id="p-subcat" class="input-light" placeholder="Subcategoría">
-                <textarea id="p-desc" class="input-light" placeholder="Descripción del producto" rows="3" style="resize:none;"></textarea>
-                <textarea id="p-imgs" class="input-light" placeholder="URLs de imágenes (máximo 8), separadas por coma" rows="3" style="resize:none;"></textarea>
-                <input type="file" id="p-files" class="input-light" accept="image/*" multiple onchange="handleAdminFilesChange(event)">
-                <button id="admin-save-btn" class="btn-green-glow full-width" onclick="addProduct()" style="margin-top: 15px;">AÑADIR PRODUCTO</button>
-                <button class="btn-outline full-width" style="margin-top: 10px;" onclick="resetAdminForm()">LIMPIAR FORMULARIO</button>
+                <input    type="text" id="p-subcat" class="input-light" placeholder="Subcategoría">
+                <textarea id="p-desc"  class="input-light" placeholder="Descripción del producto"       rows="3" style="resize:none;"></textarea>
+                <textarea id="p-imgs"  class="input-light" placeholder="URLs de imágenes (máx. 8), separadas por coma" rows="3" style="resize:none;"></textarea>
+                <input    type="file"  id="p-files" class="input-light" accept="image/*" multiple onchange="handleAdminFilesChange(event)">
+                <button id="admin-save-btn" class="btn-green-glow full-width"
+                        onclick="addProduct()" style="margin-top:15px;">AÑADIR PRODUCTO</button>
+                <button class="btn-outline full-width" style="margin-top:10px;"
+                        onclick="resetAdminForm()">LIMPIAR FORMULARIO</button>
+            </div>
+            <!-- Estado de conexión Firebase -->
+            <div id="firebase-status" style="text-align:center;padding:8px;font-size:.8rem;color:var(--text-muted);">
+                ⏳ Conectando con la base de datos…
             </div>
             <div id="admin-list"></div>
         </div>
     </div>
 
+    <!-- ===== FOOTER ===== -->
     <footer class="footer-area glass-light">
         <div class="footer-grid">
             <div class="footer-col">
@@ -286,7 +343,6 @@
                 </div>
                 <p class="copyright text-muted mt-20">© 2026 Todos los derechos reservados por PIÑA GROWSHOP</p>
             </div>
-            
             <div class="footer-col">
                 <h4 class="fredoka-title text-dark">Contactos</h4>
                 <ul class="text-muted footer-links">
@@ -295,7 +351,6 @@
                     <li>📍 San Marcos 1801, Padre Hurtado.</li>
                 </ul>
             </div>
-            
             <div class="footer-col">
                 <h4 class="fredoka-title text-dark">Instagram</h4>
                 <ul class="text-muted footer-links">
@@ -308,11 +363,14 @@
         </div>
     </footer>
 
+    <!-- ===== WHATSAPP FLOAT & TOASTS ===== -->
     <a href="https://wa.me/56945802810" class="whatsapp-float" target="_blank">
         <img src="https://img.icons8.com/fluency/96/whatsapp.png" alt="WhatsApp">
     </a>
     <div id="toast-container" class="toast-container"></div>
 
+    <!-- app.js debe ser type="module" para usar top-level await si se desea,
+         pero aquí lo mantenemos clásico y esperamos el evento firebase-ready -->
     <script src="app.js"></script>
 </body>
 </html>
