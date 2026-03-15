@@ -243,6 +243,10 @@ function showSection(id) {
         document.getElementById(id).style.display = 'block';
     }
 
+    // Cerrar menú móvil al navegar
+    const nav = document.getElementById('main-nav-links');
+    if (nav) nav.classList.remove('active');
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -293,10 +297,16 @@ function handleAdminFilesChange(event) {
 function checkAdminPassword() {
     if (prompt("Clave:") === "Pineapple420") {
         resetAdminForm();
-        document.getElementById('admin-panel').style.display = 'flex';
+        const panel = document.getElementById('admin-panel');
+        panel.style.display = 'flex';
+        panel.classList.add('open');
     }
 }
-function toggleAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+function toggleAdmin() {
+    const panel = document.getElementById('admin-panel');
+    panel.classList.remove('open');
+    panel.style.display = 'none';
+}
 
 function getProductImages(p) {
     if (Array.isArray(p.imagenes) && p.imagenes.length) return p.imagenes.slice(0, 8);
