@@ -1,486 +1,510 @@
-// 2, 4 & 6. Base de datos con subcategorías y productos exigidos y sus imágenes
-let db = JSON.parse(localStorage.getItem('pinaGrowLightDB')) || {
-    productos: [
-        { id: 1, nombre: "Bong", precio: 19000, img: "https://images.pexels.com/photos/8140273/pexels-photo-8140273.jpeg?_gl=1*1x5wsn2*_ga*MTYyNzY3Njk4OC4xNzczNTQ0MTk5*_ga_8JE65Q40S6*czE3NzM1NDQxOTgkbzEkZzEkdDE3NzM1NDU3MDMkajU0JGwwJGgw", cat: "Smoke", subcat: "Pipas", desc: "Equipa tu sesión con la mejor calidad. Este Bong ha sido seleccionado por expertos cultivadores para garantizar durabilidad, eficiencia y un diseño impecable. Perfecto para quienes buscan llevar su experiencia al siguiente nivel con total estilo." },
-        { id: 2, nombre: "Papel", precio: 20000, img: "https://drive.google.com/file/d/103O5NtDV3GdSZ0V0HDU-8T38MuWUAfN-/view?usp=sharing", cat: "Smoke", subcat: "Papelillos", desc: "Combustión lenta y natural sin aditivos químicos. Diseñados para disfrutar el sabor real de tu hierba con total suavidad." },
-        { id: 3, nombre: "Filtros", precio: 12390, img: "https://images.unsplash.com/photo-1528821128474-27f963b062bf?q=80&w=400", cat: "Smoke", subcat: "Filtros", desc: "Filtros de alta retención para una experiencia suave. Protegen tus pulmones sin alterar el flujo ni el sabor." },
-        { id: 4, nombre: "Luces", precio: 15550, img: "https://images.unsplash.com/photo-1563461660947-507ef49e9c47?q=80&w=400", cat: "Cultivo", subcat: "Luces LED", desc: "Iluminación Full Spectrum de alta eficiencia energética para potenciar la fotosíntesis y maximizar tus cosechas indoor." },
-        { id: 5, nombre: "Pipa", precio: 20000, img: "https://images.unsplash.com/photo-1603588265004-94025b6422ce?q=80&w=400", cat: "Smoke", subcat: "Pipas", desc: "Diseño ergonómico y portátil para cualquier ocasión. Cristal borosilicato resistente al calor para un humo limpio." },
-        { id: 6, nombre: "Moledor", precio: 30000, img: "https://images.unsplash.com/photo-1589218482020-ad1642a4208c?q=80&w=400", cat: "Smoke", subcat: "Pipas", desc: "Triturado perfecto y uniforme gracias a sus dientes de diamante afilados. Aluminio aeroespacial para durabilidad extrema." },
-        { id: 7, nombre: "Vaper", precio: 100200, img: "https://images.unsplash.com/photo-1536881734914-725d25950d44?q=80&w=400", cat: "Tabaquería", subcat: "Encendedores", desc: "Control de temperatura preciso para grandes nubes de vapor. Tecnología de convección que calienta la hierba sin quemarla." }
-    ],
-    carrito: []
+/* ============================================================
+   app.js — Piña GrowShop  |  Firebase Firestore Edition
+   Todos los datos viven en:
+     Firestore → colección "tienda" → documento "catalogo"
+   ============================================================ */
+
+// ──────────────────────────────────────────────────────────────
+// 1.  CONSTANTES Y ESTADO GLOBAL
+// ──────────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = "pina2026";   // ← cambia aquí si quieres otra clave
+
+const CATEGORIAS = {
+    "Smoke":      ["Pipas", "Bongs", "Papelillos", "Enroladores", "Limpieza"],
+    "Cultivo":    ["Sustratos", "Fertilizantes", "Carpas", "Iluminación", "Control de Plagas"],
+    "Tabaquería": ["Cigarrillos", "Tabaco", "Pipas de tabaco", "Accesorios"],
+    "Aromas":     ["Inciensos", "Aceites esenciales", "Difusores", "Velas"]
 };
 
-/* ---- +18 Gate ---- */
-const gate = document.getElementById('gate');
-const body = document.body;
+// Productos iniciales que se cargan si Firestore está vacío
+const PRODUCTOS_INICIALES = [
+    { id: 1700000001, nombre: "Bong de Vidrio 30cm",   precio: 15990, cat: "Smoke",      subcat: "Bongs",         img: "https://via.placeholder.com/300x300?text=Bong",         desc: "Bong de vidrio borosilicato resistente al calor." },
+    { id: 1700000002, nombre: "Papelillos RAW King",   precio: 1990,  cat: "Smoke",      subcat: "Papelillos",    img: "https://via.placeholder.com/300x300?text=RAW",          desc: "Pack de papelillos RAW King Size." },
+    { id: 1700000003, nombre: "Sustrato BioTabs 50L",  precio: 12990, cat: "Cultivo",    subcat: "Sustratos",     img: "https://via.placeholder.com/300x300?text=Sustrato",     desc: "Sustrato premium con micorrizas activas." },
+    { id: 1700000004, nombre: "Incienso Nag Champa",   precio: 2490,  cat: "Aromas",     subcat: "Inciensos",     img: "https://via.placeholder.com/300x300?text=Incienso",     desc: "Pack x20 varillas de incienso Nag Champa." },
+    { id: 1700000005, nombre: "Grinder Metálico 4P",   precio: 8990,  cat: "Smoke",      subcat: "Pipas",         img: "https://via.placeholder.com/300x300?text=Grinder",      desc: "Grinder de aluminio de 4 piezas con recolector." },
+    { id: 1700000006, nombre: "Fertilizante BioGrow",  precio: 9990,  cat: "Cultivo",    subcat: "Fertilizantes", img: "https://via.placeholder.com/300x300?text=Fertilizante", desc: "Biobizz BioGrow 500ml, crecimiento orgánico." }
+];
 
-// Revisar sesión guardada
-if (sessionStorage.getItem('pg_age_ok') === '1') {
-    gate.classList.add('gate-hidden');
-} else {
-    body.style.overflow = 'hidden';
+let catalogoGlobal  = [];   // copia local del catálogo (se actualiza con onSnapshot)
+let cart            = [];   // carrito en memoria
+let modalProducto   = null; // producto abierto en el modal
+let modalQty        = 1;
+let editingId       = null; // si está editando un producto existente
+let adminFilesB64   = [];   // imágenes cargadas localmente como base64
+
+// ──────────────────────────────────────────────────────────────
+// 2.  INICIALIZACIÓN — espera a que Firebase esté disponible
+// ──────────────────────────────────────────────────────────────
+function initApp() {
+    if (!window.db_cloud || !window.fb_methods) {
+        // Firebase aún no cargó; reintentamos en 200 ms
+        setTimeout(initApp, 200);
+        return;
+    }
+
+    const { doc, onSnapshot } = window.fb_methods;
+    const catalogoRef = doc(window.db_cloud, "tienda", "catalogo");
+
+    // ── onSnapshot: escucha cambios en tiempo real ──
+    onSnapshot(catalogoRef,
+        (docSnap) => {
+            setFirebaseStatus("✅ Conectado con Firestore", "green");
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                catalogoGlobal = Array.isArray(data.productos) ? data.productos : [];
+            } else {
+                // Documento no existe → sembrar datos iniciales
+                console.log("Firestore vacío. Cargando productos iniciales…");
+                guardarCatalogo(PRODUCTOS_INICIALES);
+                catalogoGlobal = PRODUCTOS_INICIALES;
+            }
+
+            renderProducts();
+            renderAdminList();
+        },
+        (error) => {
+            console.error("Error Firestore:", error);
+            setFirebaseStatus("❌ Sin conexión a Firestore", "red");
+            // Fallback: mostrar igual si hay algo en catalogoGlobal
+            renderProducts();
+        }
+    );
 }
 
-document.getElementById('gate-yes').addEventListener('click', () => {
-    gate.classList.add('gate-hidden');
-    body.style.overflow = '';
-    sessionStorage.setItem('pg_age_ok', '1');
-    // Al ingresar, aseguramos que la vista sea idéntica al 'Inicio' del menú
-    if (typeof showSection === 'function') showSection('inicio');
-    window.location.hash = '#inicio';
-});
+// ──────────────────────────────────────────────────────────────
+// 3.  PERSISTENCIA EN FIRESTORE
+// ──────────────────────────────────────────────────────────────
+async function guardarCatalogo(productos) {
+    try {
+        const { doc, setDoc } = window.fb_methods;
+        await setDoc(
+            doc(window.db_cloud, "tienda", "catalogo"),
+            { productos }
+        );
+    } catch (err) {
+        console.error("Error al guardar en Firestore:", err);
+        showToast("⚠️ No se pudo guardar en la nube");
+    }
+}
 
-document.getElementById('gate-no').addEventListener('click', () => {
-    window.location.href = 'https://www.google.com';
-});
+// ──────────────────────────────────────────────────────────────
+// 4.  RENDER DE PRODUCTOS
+// ──────────────────────────────────────────────────────────────
+function renderProducts(lista) {
+    const grid = document.getElementById("product-grid");
+    if (!grid) return;
 
-// --- SUBCATEGORÍAS DINÁMICAS ---
+    const productos = lista !== undefined ? lista : catalogoGlobal;
 
-// --- SUBCATEGORÍAS DINÁMICAS ---
-const subcategorias = {
-    "Todos": ["Todos"],
-    "Smoke": ["Todos", "Pipas", "Papelillos", "Filtros"],
-    "Cultivo": ["Todos", "Macetas", "Fertilizantes", "Luces LED"],
-    "Tabaquería": ["Todos", "Tabacos", "Cigarreras", "Encendedores"],
-    "Aromas": ["Todos", "Inciensos", "Aromatizantes", "Difusores"]
-};
+    if (!productos.length) {
+        grid.innerHTML = `<p class="text-muted text-center" style="grid-column:1/-1;padding:40px 0;">
+            No hay productos disponibles aún. 🍍
+        </p>`;
+        return;
+    }
+
+    grid.innerHTML = productos.map(p => {
+        const imgSrc = Array.isArray(p.imgs) && p.imgs.length ? p.imgs[0]
+                     : (p.img || "https://via.placeholder.com/300x300?text=Producto");
+        return `
+        <div class="product-card glass-light" onclick="openModal(${p.id})">
+            <img src="${imgSrc}" class="product-img" alt="${p.nombre}"
+                 onerror="this.src='https://via.placeholder.com/300x300?text=Sin+imagen'">
+            <span class="cat-badge" style="margin:8px 0 4px;">${p.cat || ""}</span>
+            <h3 class="text-dark font-bold" style="margin:4px 0;">${p.nombre}</h3>
+            <p class="text-lime-dark fredoka-title" style="font-size:1.2rem;">
+                $${Number(p.precio).toLocaleString("es-CL")}
+            </p>
+            <button class="btn-green-glow" style="width:100%;margin-top:10px;"
+                    onclick="event.stopPropagation(); addToCart(${p.id})">
+                🛒 Agregar
+            </button>
+        </div>`;
+    }).join("");
+}
+
+// ──────────────────────────────────────────────────────────────
+// 5.  FILTROS Y BÚSQUEDA
+// ──────────────────────────────────────────────────────────────
+function applyFilters() {
+    let lista = [...catalogoGlobal];
+
+    const cat    = document.getElementById("filter-cat")?.value    || "Todos";
+    const subcat = document.getElementById("filter-subcat")?.value || "Todos";
+    const precio = document.getElementById("sort-price")?.value    || "none";
+    const alpha  = document.getElementById("sort-alpha")?.value    || "none";
+
+    if (cat    !== "Todos") lista = lista.filter(p => p.cat    === cat);
+    if (subcat !== "Todos") lista = lista.filter(p => p.subcat === subcat);
+
+    if (precio === "asc")  lista.sort((a,b) => a.precio - b.precio);
+    if (precio === "desc") lista.sort((a,b) => b.precio - a.precio);
+    if (alpha  === "az")   lista.sort((a,b) => a.nombre.localeCompare(b.nombre));
+    if (alpha  === "za")   lista.sort((a,b) => b.nombre.localeCompare(a.nombre));
+
+    renderProducts(lista);
+}
 
 function updateSubcats() {
-    const cat = document.getElementById('filter-cat').value;
-    const subcatSelect = document.getElementById('filter-subcat');
-    subcatSelect.innerHTML = subcategorias[cat].map(s => `<option value="${s}">${s}</option>`).join('');
-}
-
-// Inicializar subcategorías
-updateSubcats();
-
-// --- SISTEMA AVANZADO DE FILTROS Y ORDEN ---
-function applyFilters() {
-    let res = [...db.productos];
-    const cat = document.getElementById('filter-cat').value;
-    const subcat = document.getElementById('filter-subcat').value;
-    const sortP = document.getElementById('sort-price').value;
-    const sortA = document.getElementById('sort-alpha').value;
-
-    if(cat !== 'Todos') res = res.filter(p => p.cat === cat);
-    if(subcat !== 'Todos') res = res.filter(p => p.subcat === subcat);
-
-    if(sortP === 'asc') res.sort((a,b) => a.precio - b.precio);
-    if(sortP === 'desc') res.sort((a,b) => b.precio - a.precio);
-
-    if(sortA === 'az') res.sort((a,b) => a.nombre.localeCompare(b.nombre));
-    if(sortA === 'za') res.sort((a,b) => b.nombre.localeCompare(a.nombre));
-
-    renderProducts(res);
+    const cat   = document.getElementById("filter-cat")?.value;
+    const sel   = document.getElementById("filter-subcat");
+    if (!sel) return;
+    const subs  = CATEGORIAS[cat] || [];
+    sel.innerHTML = `<option value="Todos">Todos</option>` +
+        subs.map(s => `<option value="${s}">${s}</option>`).join("");
 }
 
 function liveSearch() {
-    const term = document.getElementById('global-search').value.toLowerCase();
-    const filtered = db.productos.filter(p => p.nombre.toLowerCase().includes(term));
-    renderProducts(filtered);
-    if (term !== "") showSection('productos');
+    const q = document.getElementById("global-search")?.value.toLowerCase().trim() || "";
+    if (!q) { renderProducts(); return; }
+    const lista = catalogoGlobal.filter(p =>
+        p.nombre.toLowerCase().includes(q) ||
+        (p.desc || "").toLowerCase().includes(q) ||
+        (p.cat  || "").toLowerCase().includes(q)
+    );
+    renderProducts(lista);
+    showSection("productos");
 }
 
-// --- RENDERIZADO DE TIENDA ---
-function renderProducts(data = db.productos) {
-    const grid = document.getElementById('product-grid');
-    grid.innerHTML = data.map(p => `
-        <div class="product-card">
-            <img src="${getProductImages(p)[0]}" alt="${p.nombre}" class="img">
-            <div class="product-info">
-                <div>
-                    <p class="prod-subcat">${p.subcat}</p>
-                    <h3 class="prod-name fredoka-title text-dark">${p.nombre}</h3>
-                    <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.desc || ''}</p>
-                </div>
-                <div>
-                    <div class="prod-price">$${p.precio.toLocaleString('es-CL')}</div>
-                    <button class="btn-outline full-width" onclick="openModal(${p.id})">Ver Producto</button>
-                    <button class="btn-green-glow full-width" onclick="addToCart(${p.id}, 1)">Añadir</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-    updateAdminList();
-    localStorage.setItem('pinaGrowLightDB', JSON.stringify(db));
-}
-
-// --- MODAL DE PRODUCTO (3) ---
-let currentModalItem = null;
-let modalQty = 1;
-
+// ──────────────────────────────────────────────────────────────
+// 6.  MODAL DE PRODUCTO
+// ──────────────────────────────────────────────────────────────
 function openModal(id) {
-    currentModalItem = db.productos.find(p => p.id === id);
+    const p = catalogoGlobal.find(x => x.id === id);
+    if (!p) return;
+    modalProducto = p;
     modalQty = 1;
 
-    const modalImg = document.getElementById('modal-img');
-    const thumbs = document.getElementById('modal-thumbs');
+    const imgs = Array.isArray(p.imgs) && p.imgs.length
+               ? p.imgs
+               : [p.img || "https://via.placeholder.com/300x300?text=Sin+imagen"];
 
-    function renderThumbs(images) {
-        thumbs.innerHTML = images.map((src, idx) => `
-            <img src="${src}" class="${idx === 0 ? 'active' : ''}" draggable="true" data-index="${idx}" />
-        `).join('');
+    document.getElementById("modal-img").src   = imgs[0];
+    document.getElementById("modal-name").textContent  = p.nombre;
+    document.getElementById("modal-desc").textContent  = p.desc || "Sin descripción.";
+    document.getElementById("modal-price").textContent = `$${Number(p.precio).toLocaleString("es-CL")}`;
+    document.getElementById("modal-cat").textContent   = `${p.cat} › ${p.subcat || ""}`;
+    document.getElementById("modal-qty").textContent   = modalQty;
 
-        thumbs.querySelectorAll('img').forEach((imgEl, idx) => {
-            imgEl.addEventListener('click', () => {
-                modalImg.src = imgEl.src;
-                thumbs.querySelectorAll('img').forEach(i => i.classList.remove('active'));
-                imgEl.classList.add('active');
-            });
+    // Miniaturas
+    const thumbsEl = document.getElementById("modal-thumbs");
+    thumbsEl.innerHTML = imgs.map((src, i) =>
+        `<img src="${src}" class="thumb${i===0?' active':''}"
+              onclick="document.getElementById('modal-img').src='${src}'">`
+    ).join("");
 
-            imgEl.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', String(idx));
-                e.dataTransfer.effectAllowed = 'move';
-            });
-
-            imgEl.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            });
-
-            imgEl.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
-                const toIndex = idx;
-                if (isNaN(fromIndex) || fromIndex === toIndex) return;
-
-                const imagesArr = getProductImages(currentModalItem);
-                const [moved] = imagesArr.splice(fromIndex, 1);
-                imagesArr.splice(toIndex, 0, moved);
-
-                currentModalItem.imagenes = imagesArr;
-                currentModalItem.img = imagesArr[0];
-
-                renderThumbs(imagesArr);
-                modalImg.src = currentModalItem.img;
-            });
-        });
-    }
-
-    const images = getProductImages(currentModalItem);
-    modalImg.src = images[0];
-    modalImg.alt = currentModalItem.nombre;
-    renderThumbs(images);
-
-    document.getElementById('modal-cat').innerText = currentModalItem.cat + " / " + currentModalItem.subcat;
-    document.getElementById('modal-name').innerText = currentModalItem.nombre;
-    document.getElementById('modal-desc').innerText = currentModalItem.desc || '';
-    document.getElementById('modal-price').innerText = `$${currentModalItem.precio.toLocaleString('es-CL')}`;
-    document.getElementById('modal-qty').innerText = modalQty;
-    
-    document.getElementById('btn-modal-add').onclick = () => {
-        addToCart(currentModalItem.id, modalQty);
+    document.getElementById("btn-modal-add").onclick = () => {
+        addToCartWithQty(p.id, modalQty);
         closeModal();
     };
 
-    document.getElementById('product-modal').style.display = 'flex';
+    document.getElementById("product-modal").classList.add("active");
 }
 
 function closeModal() {
-    document.getElementById('product-modal').style.display = 'none';
+    document.getElementById("product-modal").classList.remove("active");
+    modalProducto = null;
 }
 
-function changeQty(val) {
-    modalQty += val;
-    if (modalQty < 1) modalQty = 1;
-    document.getElementById('modal-qty').innerText = modalQty;
+function changeQty(delta) {
+    modalQty = Math.max(1, modalQty + delta);
+    document.getElementById("modal-qty").textContent = modalQty;
 }
 
-// --- CARRITO ---
-function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('open'); }
-
-function addToCart(id, qty = 1) {
-    const prod = db.productos.find(p => p.id === id);
-    for(let i=0; i<qty; i++) { db.carrito.push(prod); }
-    updateCartUI();
-    showToast(`🍍 ${qty}x ${prod.nombre} añadido`);
+// ──────────────────────────────────────────────────────────────
+// 7.  CARRITO
+// ──────────────────────────────────────────────────────────────
+function addToCart(id) {
+    addToCartWithQty(id, 1);
 }
 
-function updateCartUI() {
-    const cont = document.getElementById('cart-items');
-    let subtotal = 0;
-    cont.innerHTML = db.carrito.map((item, index) => {
-        subtotal += item.precio;
-        return `
-        <div class="cart-item">
-            <div>
-                <strong class="text-dark" style="display:block; font-size:0.95rem;">${item.nombre}</strong>
-                <span class="text-lime-dark font-bold">$${item.precio.toLocaleString('es-CL')}</span>
-            </div>
-            <button onclick="removeFromCart(${index})" class="btn-close-naked" style="font-size:1.2rem;">✕</button>
-        </div>`;
-    }).join('');
-
-    document.getElementById('cart-count').innerText = db.carrito.length;
-    document.getElementById('cart-total').innerText = `$${subtotal.toLocaleString('es-CL')}`;
+function addToCartWithQty(id, qty) {
+    const p = catalogoGlobal.find(x => x.id === id);
+    if (!p) return;
+    const item = cart.find(x => x.id === id);
+    if (item) item.qty += qty;
+    else      cart.push({ ...p, qty });
+    updateCart();
+    showToast(`✅ ${p.nombre} añadido`);
 }
 
-function removeFromCart(index) {
-    db.carrito.splice(index, 1);
-    updateCartUI();
+function removeFromCart(id) {
+    cart = cart.filter(x => x.id !== id);
+    updateCart();
+}
+
+function updateCart() {
+    const cont  = document.getElementById("cart-items");
+    const total = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+
+    cont.innerHTML = cart.length
+        ? cart.map(i => `
+            <div class="cart-item">
+                <div>
+                    <p class="text-dark font-bold">${i.nombre}</p>
+                    <p class="text-muted" style="font-size:.85rem;">
+                        $${Number(i.precio).toLocaleString("es-CL")} × ${i.qty}
+                    </p>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <strong class="text-lime-dark">$${(i.precio * i.qty).toLocaleString("es-CL")}</strong>
+                    <button onclick="removeFromCart(${i.id})"
+                            style="background:none;border:none;cursor:pointer;font-size:1rem;">🗑️</button>
+                </div>
+            </div>`).join("")
+        : `<p class="text-muted text-center" style="padding:30px 0;">Tu carrito está vacío 🛒</p>`;
+
+    document.getElementById("cart-count").textContent = cart.reduce((s, i) => s + i.qty, 0);
+    document.getElementById("cart-total").textContent = `$${total.toLocaleString("es-CL")}`;
 }
 
 function checkout() {
-    if (db.carrito.length === 0) return alert("Tu carro está vacío.");
-    let msg = `¡Hola Piña GrowShop! 🍍 Quiero pedir lo siguiente:\n\n`;
-    db.carrito.forEach(p => msg += `- ${p.nombre}\n`);
-    msg += `\nTotal a pagar: ${document.getElementById('cart-total').innerText}\n\n¿Tienen stock disponible?`;
-    window.open(`https://wa.me/56945802810?text=${encodeURIComponent(msg)}`, '_blank');
+    if (!cart.length) { showToast("Tu carrito está vacío"); return; }
+    const lineas = cart.map(i =>
+        `• ${i.nombre} x${i.qty} = $${(i.precio * i.qty).toLocaleString("es-CL")}`
+    ).join("%0A");
+    const total = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+    const msg   = `¡Hola Piña GrowShop!%0AQuiero hacer este pedido:%0A${lineas}%0A%0ATOTAL: $${total.toLocaleString("es-CL")}`;
+    window.open(`https://wa.me/56945802810?text=${msg}`, "_blank");
 }
 
-// --- UTILIDADES ---
-function showSection(id) {
-    document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
-
-    // Inicio usa dos secciones (hero + reseñas) para que coincida con la vista inicial después del gate.
-    if (id === 'inicio') {
-        document.getElementById('inicio').style.display = 'block';
-        const reviews = document.getElementById('inicio-reviews');
-        if (reviews) reviews.style.display = 'block';
-    } else {
-        document.getElementById(id).style.display = 'block';
-    }
-
-    // Cerrar menú móvil al navegar
-    const nav = document.getElementById('main-nav-links');
-    if (nav) nav.classList.remove('active');
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+// ──────────────────────────────────────────────────────────────
+// 8.  PANEL DE ADMINISTRACIÓN
+// ──────────────────────────────────────────────────────────────
+function checkAdminPassword() {
+    const clave = prompt("🔐 Ingresa la clave de administrador:");
+    if (clave === ADMIN_PASSWORD) toggleAdmin();
+    else if (clave !== null)      showToast("❌ Clave incorrecta");
 }
 
-function toggleMobileMenu() {
-    document.getElementById('main-nav-links').classList.toggle('active');
+function toggleAdmin() {
+    const panel = document.getElementById("admin-panel");
+    panel.classList.toggle("active");
+    if (panel.classList.contains("active")) resetAdminForm();
 }
 
-function showToast(msg) {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = 'toast-msg';
-    toast.innerText = msg;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
+// ── Agregar / Editar producto ──────────────────────────────────
+async function addProduct() {
+    const nombre = document.getElementById("p-nombre").value.trim();
+    const precio = parseInt(document.getElementById("p-precio").value, 10);
+    const cat    = document.getElementById("p-cat").value;
+    const subcat = document.getElementById("p-subcat").value.trim();
+    const desc   = document.getElementById("p-desc").value.trim();
+    const imgsRaw= document.getElementById("p-imgs").value.trim();
 
-// --- ADMIN ---
-let editingProductId = null;
-let adminFilesData = [];
-
-function readFilesAsDataURLs(files) {
-    const reads = Array.from(files)
-        .slice(0, 8)
-        .map(file => new Promise(resolve => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => resolve(null);
-            reader.readAsDataURL(file);
-        }));
-    return Promise.all(reads).then(results => results.filter(Boolean));
-}
-
-function handleAdminFilesChange(event) {
-    const files = event.target.files;
-    if (!files || files.length === 0) {
-        adminFilesData = [];
+    if (!nombre || isNaN(precio) || precio <= 0) {
+        showToast("⚠️ Completa Nombre y Precio correctamente");
         return;
     }
-    if (files.length > 8) {
-        showToast('⚠️ Solo se procesarán las primeras 8 imágenes.');
+
+    // Construir array de imágenes: base64 cargados + URLs escritas
+    let imgs = [...adminFilesB64];
+    if (imgsRaw) {
+        const urls = imgsRaw.split(",").map(u => u.trim()).filter(Boolean);
+        imgs = [...imgs, ...urls];
     }
-    readFilesAsDataURLs(files).then(dataUrls => {
-        adminFilesData = dataUrls.slice(0, 8);
-        showToast(`✅ ${adminFilesData.length} imagen(es) lista(s)`);
-    });
+    if (!imgs.length) imgs = ["https://via.placeholder.com/300x300?text=" + encodeURIComponent(nombre)];
+    imgs = imgs.slice(0, 8); // máximo 8
+
+    const btn = document.getElementById("admin-save-btn");
+    btn.disabled = true;
+    btn.textContent = "Guardando…";
+
+    let lista;
+    if (editingId !== null) {
+        // Modo edición
+        lista = catalogoGlobal.map(p =>
+            p.id === editingId
+                ? { ...p, nombre, precio, cat, subcat, desc, imgs, img: imgs[0] }
+                : p
+        );
+        showToast("✏️ Producto actualizado");
+        editingId = null;
+    } else {
+        // Modo creación
+        const newProd = {
+            id:     Date.now(),
+            nombre, precio, cat, subcat, desc,
+            imgs,
+            img:    imgs[0]
+        };
+        lista = [...catalogoGlobal, newProd];
+        showToast("✅ Producto añadido");
+    }
+
+    await guardarCatalogo(lista);
+
+    btn.disabled = false;
+    btn.textContent = "AÑADIR PRODUCTO";
+    resetAdminForm();
 }
 
-function checkAdminPassword() {
-    if (prompt("Clave:") === "Pineapple420") {
-        resetAdminForm();
-        const panel = document.getElementById('admin-panel');
-        panel.style.display = 'flex';
-        panel.classList.add('open');
-    }
-}
-function toggleAdmin() {
-    const panel = document.getElementById('admin-panel');
-    panel.classList.remove('open');
-    panel.style.display = 'none';
+function editProduct(id) {
+    const p = catalogoGlobal.find(x => x.id === id);
+    if (!p) return;
+    editingId = id;
+
+    document.getElementById("p-nombre").value = p.nombre;
+    document.getElementById("p-precio").value = p.precio;
+    document.getElementById("p-cat").value    = p.cat;
+    document.getElementById("p-subcat").value = p.subcat || "";
+    document.getElementById("p-desc").value   = p.desc   || "";
+    document.getElementById("p-imgs").value   = (Array.isArray(p.imgs) ? p.imgs : [p.img || ""]).join(", ");
+    adminFilesB64 = [];
+
+    document.getElementById("admin-save-btn").textContent = "💾 GUARDAR CAMBIOS";
+    document.getElementById("admin-panel").scrollTop = 0;
+    showToast("📝 Editando: " + p.nombre);
 }
 
-function getProductImages(p) {
-    if (Array.isArray(p.imagenes) && p.imagenes.length) return p.imagenes.slice(0, 8);
-    if (typeof p.img === 'string' && p.img.trim()) return [p.img];
-    return ["https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=400"];
+async function deleteProduct(id) {
+    if (!confirm("¿Eliminar este producto?")) return;
+    const lista = catalogoGlobal.filter(p => p.id !== id);
+    await guardarCatalogo(lista);
+    showToast("🗑️ Producto eliminado");
 }
 
 function resetAdminForm() {
-    editingProductId = null;
-    adminFilesData = [];
-    document.getElementById('p-nombre').value = '';
-    document.getElementById('p-precio').value = '';
-    document.getElementById('p-cat').value = 'Smoke';
-    document.getElementById('p-subcat').value = '';
-    document.getElementById('p-desc').value = '';
-    document.getElementById('p-imgs').value = '';
-    document.getElementById('p-files').value = '';
-    document.getElementById('admin-save-btn').innerText = 'AÑADIR PRODUCTO';
+    ["p-nombre","p-precio","p-subcat","p-desc","p-imgs"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
+    const catEl = document.getElementById("p-cat");
+    if (catEl) catEl.selectedIndex = 0;
+    adminFilesB64 = [];
+    editingId = null;
+    const btn = document.getElementById("admin-save-btn");
+    if (btn) btn.textContent = "AÑADIR PRODUCTO";
 }
 
-function loadProductToForm(id) {
-    const prod = db.productos.find(p => p.id === id);
-    if (!prod) return;
+// ── Render lista de admin ──────────────────────────────────────
+function renderAdminList() {
+    const lista = document.getElementById("admin-list");
+    if (!lista) return;
 
-    editingProductId = id;
-    adminFilesData = [];
-    document.getElementById('p-nombre').value = prod.nombre || '';
-    document.getElementById('p-precio').value = prod.precio || '';
-    document.getElementById('p-cat').value = prod.cat || 'Smoke';
-    document.getElementById('p-subcat').value = prod.subcat || '';
-    document.getElementById('p-desc').value = prod.desc || '';
-    document.getElementById('p-imgs').value = getProductImages(prod).join(', ');
-    document.getElementById('p-files').value = '';
-    document.getElementById('admin-save-btn').innerText = 'GUARDAR CAMBIOS';
-}
-
-function addProduct() {
-    const nom = document.getElementById('p-nombre').value.trim();
-    const pre = document.getElementById('p-precio').value;
-    const cat = document.getElementById('p-cat').value;
-    const subcat = document.getElementById('p-subcat').value.trim() || 'General';
-    const desc = document.getElementById('p-desc').value.trim() || 'Nuevo producto añadido a Piña GrowShop.';
-    const urlImgs = document.getElementById('p-imgs').value
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean);
-
-    const totalImages = urlImgs.length + adminFilesData.length;
-    if (totalImages > 8) {
-        showToast('⚠️ Máximo 8 imágenes por producto. Se guardarán las primeras 8.');
-    }
-
-    const imgs = [...urlImgs, ...adminFilesData].slice(0, 8);
-
-    if (!nom || !pre) {
-        showToast('⚠️ Completa nombre y precio.');
+    if (!catalogoGlobal.length) {
+        lista.innerHTML = `<p class="text-muted text-center" style="padding:20px 0;">Sin productos aún.</p>`;
         return;
     }
 
-    const mainImg = imgs[0] || "https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=400";
-
-    if (editingProductId) {
-        const prod = db.productos.find(p => p.id === editingProductId);
-        if (!prod) return;
-
-        prod.nombre = nom;
-        prod.precio = parseInt(pre);
-        prod.cat = cat;
-        prod.subcat = subcat;
-        prod.desc = desc;
-        prod.imagenes = imgs.length ? imgs : [mainImg];
-        prod.img = mainImg;
-
-        showToast('✅ Producto actualizado');
-    } else {
-        db.productos.push({
-            id: Date.now(),
-            nombre: nom,
-            precio: parseInt(pre),
-            cat: cat,
-            subcat: subcat,
-            desc: desc,
-            imagenes: imgs.length ? imgs : [mainImg],
-            img: mainImg
-        });
-        showToast('✅ Producto agregado');
-    }
-
-    resetAdminForm();
-    applyFilters();
+    lista.innerHTML = `
+        <h3 class="fredoka-title text-dark" style="margin:20px 0 10px;">
+            Productos en Firestore (${catalogoGlobal.length})
+        </h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            ${catalogoGlobal.map(p => {
+                const imgSrc = Array.isArray(p.imgs) && p.imgs.length ? p.imgs[0] : (p.img || "");
+                return `
+                <div class="admin-item glass-translucent" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;">
+                    <img src="${imgSrc}" width="48" height="48"
+                         style="border-radius:8px;object-fit:cover;"
+                         onerror="this.style.display='none'">
+                    <div style="flex:1;min-width:0;">
+                        <p class="text-dark font-bold" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.nombre}</p>
+                        <p class="text-muted" style="font-size:.8rem;">${p.cat} › ${p.subcat||""} — $${Number(p.precio).toLocaleString("es-CL")}</p>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button onclick="editProduct(${p.id})"
+                                style="background:var(--lime-fluor);border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:800;">
+                            ✏️
+                        </button>
+                        <button onclick="deleteProduct(${p.id})"
+                                style="background:#ff5252;color:white;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:800;">
+                            🗑️
+                        </button>
+                    </div>
+                </div>`;
+            }).join("")}
+        </div>`;
 }
 
-function updateAdminList() {
-    document.getElementById('admin-list').innerHTML = db.productos.map(p => `
-        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; margin-top:5px;">
-            <span class="text-dark" style="flex:1;">${p.nombre}</span>
-            <div style="display:flex; gap: 8px;">
-                <button onclick="loadProductToForm(${p.id})" style="color:#1a73e8; background:none; border:none; cursor:pointer; font-weight:800;">Editar</button>
-                <button onclick="deleteProduct(${p.id})" style="color:#ff3333; background:none; border:none; cursor:pointer; font-weight:800;">Borrar</button>
-            </div>
-        </div>
-    `).join('');
-}
+// ── Manejo de archivos locales (File API → base64) ─────────────
+function handleAdminFilesChange(event) {
+    const files = Array.from(event.target.files).slice(0, 8);
+    adminFilesB64 = [];
+    let loaded = 0;
 
-function deleteProduct(id) {
-    db.productos = db.productos.filter(p => p.id !== id);
-    applyFilters();
-}
+    if (!files.length) return;
 
-// Inicializar
-renderProducts();
-updateCartUI();
-
-// --- RESEÑAS: AUTO-LOOP POR HOVER LATERAL ---
-function initReviewHoverScroll() {
-    const container = document.querySelector('.reviews-slider-container');
-    const track = document.getElementById('reviews-track');
-    if (!container || !track) return;
-
-    // Duplicar contenido para bucle infinito.
-    const originalCards = Array.from(track.children);
-    const cloneA = track.cloneNode(true);
-    const cloneB = track.cloneNode(true);
-
-    track.append(...cloneA.children);
-    track.append(...cloneB.children);
-
-    const baseWidth = track.scrollWidth / 3; // ancho de un bloque (original)
-
-    let velocity = 0;
-    let rafId = null;
-
-    function normalizeScroll() {
-        if (container.scrollLeft >= baseWidth * 2) {
-            container.scrollLeft -= baseWidth;
-        } else if (container.scrollLeft <= 0) {
-            container.scrollLeft += baseWidth;
-        }
-    }
-
-    function frame() {
-        if (velocity !== 0) {
-            container.scrollLeft += velocity;
-            normalizeScroll();
-        }
-        rafId = requestAnimationFrame(frame);
-    }
-
-    function onMove(e) {
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const edge = rect.width * 0.25;
-
-        if (x < edge) {
-            velocity = -4; // hacia la izquierda
-        } else if (x > rect.width - edge) {
-            velocity = 4; // hacia la derecha
-        } else {
-            velocity = 0;
-        }
-    }
-
-    function stopMotion() {
-        velocity = 0;
-    }
-
-    container.addEventListener('mouseenter', () => {
-        if (!rafId) frame();
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            adminFilesB64.push(e.target.result);
+            loaded++;
+            if (loaded === files.length) showToast(`📷 ${loaded} imagen(es) lista(s)`);
+        };
+        reader.readAsDataURL(file);
     });
-    container.addEventListener('mouseleave', () => stopMotion());
-    container.addEventListener('mousemove', onMove);
-
-    // Establecer posición de inicio en el bloque medio
-    container.scrollLeft = baseWidth;
 }
 
-initReviewHoverScroll();
+// ──────────────────────────────────────────────────────────────
+// 9.  NAVEGACIÓN Y UI
+// ──────────────────────────────────────────────────────────────
+function showSection(id) {
+    // Ocultar todas las secciones visibles
+    document.querySelectorAll(".page-section").forEach(s => {
+        s.style.display = "none";
+        s.classList.remove("active");
+    });
+    // Mostrar la pedida
+    const target = document.getElementById(id);
+    if (target) {
+        target.style.display = "block";
+        target.classList.add("active");
+    }
+    // Ocultar el menú móvil si está abierto
+    document.getElementById("main-nav-links")?.classList.remove("open");
+}
+
+function toggleCart() {
+    document.getElementById("cart-sidebar").classList.toggle("active");
+}
+
+function toggleMobileMenu() {
+    document.getElementById("main-nav-links")?.classList.toggle("open");
+}
+
+function showToast(msg) {
+    const t = document.createElement("div");
+    t.className  = "toast-msg";
+    t.textContent = msg;
+    document.getElementById("toast-container").appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+}
+
+function setFirebaseStatus(msg, color) {
+    const el = document.getElementById("firebase-status");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = color === "green" ? "var(--green)" : "#ff5252";
+}
+
+// ──────────────────────────────────────────────────────────────
+// 10.  GATE +18
+// ──────────────────────────────────────────────────────────────
+function closeGate() {
+    document.getElementById("gate").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("gate-yes")?.addEventListener("click", closeGate);
+    document.getElementById("gate-no")?.addEventListener("click",  () => {
+        window.location.href = "https://www.google.com";
+    });
+
+    // Mostrar sección inicio por defecto
+    showSection("inicio");
+});
+
+// ──────────────────────────────────────────────────────────────
+// 11.  ARRANQUE — esperar Firebase
+// ──────────────────────────────────────────────────────────────
+if (window.db_cloud) {
+    initApp();
+} else {
+    window.addEventListener("firebase-ready", initApp, { once: true });
+    // Doble seguridad: si el evento ya disparó antes de que este script cargara
+    setTimeout(() => { if (window.db_cloud && !catalogoGlobal.length) initApp(); }, 1000);
+}
