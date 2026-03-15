@@ -1,103 +1,433 @@
-Aquí tienes el archivo **README.md** (Markdown) estructurado de forma profesional. Este documento es el estándar en la industria para explicar cómo funciona un proyecto y es ideal para que lo incluyas en tu repositorio de GitHub.
+# 🍍 Piña GrowShop — Guía Técnica Completa (Firebase Edition)
 
----
-
-# 🍍 Piña Growshop | Web App & Admin System
-
-Bienvenido a la documentación técnica de la réplica funcional de **Piña Growshop**. Este proyecto es una Single Page Application (SPA) diseñada para gestionar un catálogo de productos de forma dinámica sin necesidad de modificar el código fuente constantemente.
+> **Versión:** Firebase Firestore  
+> **Stack:** HTML5 · CSS3 · JavaScript Vanilla · Firebase v10 (Modular SDK)  
+> **Base de datos:** Cloud Firestore (Google Firebase)
 
 ---
 
 ## 📑 ÍNDICE
 
-1. [¿Qué es esta web?](https://www.google.com/search?q=%23qu%C3%A9-es-esta-web)
-2. [¿Para qué sirve el sitio?](https://www.google.com/search?q=%23para-qu%C3%A9-sirve-el-sitio)
-3. [Cómo funciona el sistema de productos](https://www.google.com/search?q=%23c%C3%B3mo-funciona-el-sistema-de-productos)
-4. [Cómo funciona el carrito](https://www.google.com/search?q=%23c%C3%B3mo-funciona-el-carrito)
-5. [Cómo agregar nuevos productos](https://www.google.com/search?q=%23c%C3%B3mo-agregar-nuevos-productos)
-6. [Cómo actualizar productos existentes](https://www.google.com/search?q=%23c%C3%B3mo-actualizar-productos-existentes)
-7. [Cómo modificar textos de la web](https://www.google.com/search?q=%23c%C3%B3mo-modificar-textos-de-la-web)
-8. [Cómo cambiar imágenes](https://www.google.com/search?q=%23c%C3%B3mo-cambiar-im%C3%A1genes)
-9. [Qué contiene cada carpeta](https://www.google.com/search?q=%23qu%C3%A9-contiene-cada-carpeta)
-10. [Explicación de archivos importantes](https://www.google.com/search?q=%23explicaci%C3%B3n-de-archivos-importantes)
-11. [Archivos que NO deben modificarse](https://www.google.com/search?q=%23archivos-que-no-deben-modificarse)
-12. [Cómo mantener la web con el tiempo](https://www.google.com/search?q=%23c%C3%B3mo-mantener-la-web-con-el-tiempo)
+1. [Arquitectura del proyecto](#1-arquitectura-del-proyecto)
+2. [Cómo funciona Firebase en este proyecto](#2-cómo-funciona-firebase-en-este-proyecto)
+3. [Variables y tokens que puedes cambiar sin riesgo](#3-variables-y-tokens-que-puedes-cambiar-sin-riesgo)
+4. [Textos editables del sitio](#4-textos-editables-del-sitio)
+5. [Colores y diseño](#5-colores-y-diseño)
+6. [Sistema de categorías y subcategorías](#6-sistema-de-categorías-y-subcategorías)
+7. [Cómo agregar productos iniciales (seed data)](#7-cómo-agregar-productos-iniciales-seed-data)
+8. [Cómo cambiar la clave de administrador](#8-cómo-cambiar-la-clave-de-administrador)
+9. [Cómo cambiar el número de WhatsApp](#9-cómo-cambiar-el-número-de-whatsapp)
+10. [Cómo cambiar la ubicación del mapa](#10-cómo-cambiar-la-ubicación-del-mapa)
+11. [Cómo funciona el carrito y el checkout](#11-cómo-funciona-el-carrito-y-el-checkout)
+12. [Imágenes: formatos aceptados](#12-imágenes-formatos-aceptados)
+13. [Funciones clave de app.js y qué reemplaza a qué](#13-funciones-clave-de-appjs-y-qué-reemplaza-a-qué)
+14. [Clases CSS importantes: no las cambies de nombre](#14-clases-css-importantes-no-las-cambies-de-nombre)
+15. [Configuración de Firebase: qué es cada credencial](#15-configuración-de-firebase-qué-es-cada-credencial)
+16. [Reglas de seguridad sugeridas en Firestore](#16-reglas-de-seguridad-sugeridas-en-firestore)
+17. [Qué NO debes modificar](#17-qué-no-debes-modificar)
+18. [Preguntas frecuentes (FAQ)](#18-preguntas-frecuentes-faq)
 
 ---
 
-## ¿Qué es esta web?
+## 1. Arquitectura del proyecto
 
-Es un **prototipo funcional de E-commerce** especializado en el nicho de Grow Shops. Utiliza tecnologías de Front-end (HTML5, CSS3 y JavaScript Vanila) para simular una tienda real con un panel de administración integrado que no requiere de un servidor externo (Backend) para pruebas locales o de portafolio.
+```
+/
+├── index.html   → Estructura HTML + inicialización de Firebase (script type="module")
+├── app.js       → Toda la lógica: Firestore CRUD, carrito, filtros, admin, UI
+├── style.css    → Sistema visual completo: colores, componentes, responsive
+└── nota.md      → Esta guía
+```
 
-## ¿Para qué sirve el sitio?
-
-Sirve como plataforma de exhibición y gestión de inventario. Permite a un administrador gestionar qué productos se ven en la tienda, actualizar precios y modificar la información de contacto de manera visual, facilitando la escalabilidad del sitio sin tocar archivos `.html`.
-
-## Cómo funciona el sistema de productos
-
-El sistema se basa en un objeto de datos llamado `db` (Database).
-
-* **Lectura:** El archivo `app.js` lee la lista de productos y genera automáticamente las "tarjetas" en la grilla.
-* **Almacenamiento:** Utiliza el **LocalStorage** del navegador. Esto significa que si cierras la página o la recargas, los productos que creaste seguirán ahí.
-
-## Cómo funciona el carrito
-
-Cada producto tiene un botón de "Agregar". Al pulsarlo:
-
-1. Se identifica el ID del producto.
-2. Se suma a un arreglo temporal de compra.
-3. El contador en la barra de navegación se actualiza en tiempo real.
-
-## Cómo agregar nuevos productos
-
-1. Haz clic en el icono de **⚙️ Admin**.
-2. En la sección "Gestionar Productos", completa el nombre, el precio y el icono (o URL de imagen).
-3. Presiona **"Añadir Producto"**.
-4. El producto aparecerá instantáneamente en la sección de "Productos".
-
-## Cómo actualizar productos existentes
-
-Para actualizar, el sistema actual permite la **eliminación y re-creación**:
-
-* Busca el producto en la lista del panel Admin.
-* Haz clic en **"Eliminar"**.
-* Vuelve a agregarlo con los datos corregidos (Precio/Nombre).
-
-## Cómo modificar textos de la web
-
-Dentro del Panel Admin, encontrarás campos de texto para el **Título** y **Subtítulo** del Hero. Al cambiar el texto y dar clic en "Guardar", la web actualiza el encabezado principal sin necesidad de editar el archivo `index.html`.
-
-## Cómo cambiar imágenes
-
-El sistema acepta dos formatos:
-
-* **Emojis:** (Ej: 🌿, 📦) Para pruebas rápidas.
-* **URLs externas:** Puedes pegar el link de una imagen subida a internet (Ej: `https://sitio.com/foto.jpg`) en el campo de imagen del panel Admin.
-
-## Qué contiene cada carpeta
-
-* `/`: Raíz del proyecto con los archivos principales.
-* `/assets`: (Opcional) Aquí se guardan los logos, iconos y fotos locales.
-* `/css`: Contiene las hojas de estilo.
-* `/js`: Contiene la lógica del carrito y el administrador.
-
-## Explicación de archivos importantes
-
-* `index.html`: La cáscara de la web. Contiene las secciones (Inicio, Productos, Nosotros, Contacto).
-* `style.css`: Define la identidad visual (colores negros y verdes, tipografía Poppins).
-* `app.js`: El "cerebro". Maneja el guardado de datos y el cambio de secciones.
-
-## Archivos que NO deben modificarse
-
-* **`app.js` (Lógica de Render):** Si modificas las funciones de renderizado sin conocimiento de JS, el panel de Admin dejará de mostrar los productos.
-* **Clases de CSS:** No cambies los nombres de las clases en el HTML (ej: `product-grid`) ya que el JS las busca por ese nombre exacto.
-
-## Cómo mantener la web con el tiempo
-
-1. **Limpieza de caché:** Si la web se comporta extraño, puedes limpiar el LocalStorage desde la consola del navegador.
-2. **Backup de datos:** Si tienes muchos productos, copia el texto que aparece en el `localStorage` de la consola para no perderlo.
-3. **Actualización de Fotos:** Asegúrate de que los links de las imágenes externas sigan vigentes para evitar errores de carga.
+**Flujo de datos:**
+```
+Navegador → Firebase SDK v10 → Cloud Firestore
+                                     ↓
+                              onSnapshot (tiempo real)
+                                     ↓
+                           catalogoGlobal (array en RAM)
+                                     ↓
+                             renderProducts()
+```
 
 ---
 
-> **Nota:** Este proyecto es para fines de portafolio. Para una tienda real con pagos masivos, se recomienda migrar a una base de datos real (Firebase o MongoDB).
+## 2. Cómo funciona Firebase en este proyecto
+
+### Dónde viven los datos
+
+Todos los productos se guardan en **un solo documento** de Firestore:
+
+```
+Colección: tienda
+  └── Documento: catalogo
+        └── Campo: productos  (array de objetos)
+```
+
+Cada objeto del array tiene esta forma:
+
+```json
+{
+  "id":     1700000001,
+  "nombre": "Bong de Vidrio 30cm",
+  "precio": 15990,
+  "cat":    "Smoke",
+  "subcat": "Bongs",
+  "desc":   "Descripción del producto.",
+  "img":    "https://url-principal.com/foto.jpg",
+  "imgs":   ["https://url1.jpg", "https://url2.jpg"]
+}
+```
+
+### Sincronización en tiempo real
+
+La función `onSnapshot` en `app.js` escucha cambios en Firestore al instante:
+
+```javascript
+onSnapshot(catalogoRef, (docSnap) => {
+    // Este bloque se ejecuta CADA VEZ que alguien modifica el catálogo
+    catalogoGlobal = docSnap.data().productos;
+    renderProducts();   // la pantalla se actualiza sola
+    renderAdminList();  // la lista del admin también
+});
+```
+
+Esto significa que si abres la web en dos navegadores diferentes y agregas un producto desde uno, **el otro se actualiza sin recargar**.
+
+---
+
+## 3. Variables y tokens que puedes cambiar sin riesgo
+
+### En `app.js` — Línea 1 a 30
+
+| Variable           | Valor por defecto | Qué controla                        |
+|--------------------|-------------------|--------------------------------------|
+| `ADMIN_PASSWORD`   | `"pina2026"`      | Clave del panel de administración    |
+| `CATEGORIAS`       | Objeto con 4 cats | Categorías y subcategorías del filtro|
+| `PRODUCTOS_INICIALES` | Array de 6 productos | Los que se cargan si Firestore está vacío |
+
+### En `index.html` — `firebaseConfig`
+
+| Clave              | Qué es                                      |
+|--------------------|---------------------------------------------|
+| `apiKey`           | Clave pública de tu proyecto Firebase       |
+| `authDomain`       | Dominio de autenticación                    |
+| `projectId`        | ID del proyecto (visible en Firebase Console)|
+| `storageBucket`    | Bucket de Storage (para archivos grandes)   |
+| `messagingSenderId`| ID del servicio de mensajería               |
+| `appId`            | ID único de la aplicación web               |
+| `measurementId`    | ID de Google Analytics (opcional, puedes borrarlo si no lo usas)|
+
+---
+
+## 4. Textos editables del sitio
+
+### Título y subtítulo principal (Hero)
+
+Están en `index.html`, sección `#inicio`:
+
+```html
+<h1 id="txt-hero-titulo">
+    Lleva tu cultivo al <br><span class="text-lime-dark">siguiente nivel</span>
+</h1>
+<p id="txt-hero-sub">
+    Venta de Parafernalia, Productos de Cultivo y Tabaquería.
+</p>
+```
+
+**Para cambiarlos:** edita el texto directamente entre las etiquetas.
+
+### Ticker (banner superior animado)
+
+```html
+<div class="ticker-item">
+    🍍 ¡OFERTAS EXCLUSIVAS! — ENVÍOS A TODO CHILE — SAN MARCOS 1801, PADRE HURTADO — ASESORÍA EXPERTA 🍍
+</div>
+```
+
+Cambia el texto por el tuyo. El segundo `ticker-item` es una copia para que la animación sea continua — cámbialo también.
+
+### Footer: dirección, redes sociales
+
+Busca en `index.html` la sección `<footer>` y edita las etiquetas `<li>` y `<a>`.
+
+---
+
+## 5. Colores y diseño
+
+Todos los colores están centralizados en `style.css` como variables CSS en `:root`:
+
+```css
+:root {
+    --lime-fluor:    #aee600;  /* verde lima fluorescente (botones principales) */
+    --lime-dark:     #82b300;  /* verde lima oscuro (precios, acentos) */
+    --green:         #4caf50;  /* verde esmeralda (bordes activos) */
+    --green-emerald: #4caf50;  /* alias del verde esmeralda */
+    --yellow:        #fdd835;  /* amarillo (blobs decorativos) */
+    --text-dark:     #1a231a;  /* texto principal (casi negro verdoso) */
+    --text-muted:    #667a66;  /* texto secundario (gris verdoso) */
+    --bg-main:       #f9fbf9;  /* fondo general (blanco con tono verde) */
+    --bg-card:       #ffffff;  /* fondo de tarjetas */
+}
+```
+
+**Para cambiar el color principal de botones:** cambia `--lime-fluor`.  
+**Para cambiar el color de precios:** cambia `--lime-dark`.  
+**Para modo oscuro:** cambia `--bg-main` y `--bg-card` a colores oscuros.
+
+---
+
+## 6. Sistema de categorías y subcategorías
+
+En `app.js`, el objeto `CATEGORIAS` define qué aparece en los filtros y en el panel admin:
+
+```javascript
+const CATEGORIAS = {
+    "Smoke":      ["Pipas", "Bongs", "Papelillos", "Enroladores", "Limpieza"],
+    "Cultivo":    ["Sustratos", "Fertilizantes", "Carpas", "Iluminación", "Control de Plagas"],
+    "Tabaquería": ["Cigarrillos", "Tabaco", "Pipas de tabaco", "Accesorios"],
+    "Aromas":     ["Inciensos", "Aceites esenciales", "Difusores", "Velas"]
+};
+```
+
+**Para agregar una nueva categoría:** añade una clave nueva al objeto.  
+**Para agregar subcategorías:** añade strings al array de la categoría correspondiente.
+
+También debes sincronizar el `<select id="filter-cat">` y el `<select id="p-cat">` en `index.html` con las mismas claves del objeto `CATEGORIAS`.
+
+---
+
+## 7. Cómo agregar productos iniciales (seed data)
+
+En `app.js`, el array `PRODUCTOS_INICIALES` se carga **una sola vez**, cuando Firestore no tiene ningún documento:
+
+```javascript
+const PRODUCTOS_INICIALES = [
+    {
+        id:     1700000001,        // número único; usa Date.now() para generar uno
+        nombre: "Nombre del producto",
+        precio: 9990,              // precio en pesos, sin puntos ni símbolos
+        cat:    "Smoke",           // debe coincidir con una clave de CATEGORIAS
+        subcat: "Bongs",           // debe coincidir con un valor del array de esa cat
+        img:    "https://...",     // URL de imagen principal
+        imgs:   ["https://..."],   // array de hasta 8 URLs (puede ser igual a img)
+        desc:   "Descripción."
+    },
+    // ... más productos
+];
+```
+
+**Importante:** si Firestore ya tiene datos, este array **no se ejecuta**. Para resetear, borra el documento `tienda/catalogo` desde la consola de Firebase.
+
+---
+
+## 8. Cómo cambiar la clave de administrador
+
+En `app.js`, línea 7:
+
+```javascript
+const ADMIN_PASSWORD = "pina2026";
+```
+
+Cambia `"pina2026"` por la clave que quieras. No hay mínimo de caracteres, pero se recomienda al menos 8.
+
+**Nota de seguridad:** esta clave es visible en el código fuente del navegador. Para mayor seguridad en producción, considera usar Firebase Authentication.
+
+---
+
+## 9. Cómo cambiar el número de WhatsApp
+
+Hay **tres lugares** donde aparece el número. Busca `56945802810` y reemplázalo en todos:
+
+1. **Footer** (`index.html`):
+   ```html
+   <a href="https://api.whatsapp.com/send/?phone=56945802810">
+   ```
+
+2. **Botón flotante** (`index.html`):
+   ```html
+   <a href="https://wa.me/56945802810" class="whatsapp-float">
+   ```
+
+3. **Función checkout** (`app.js`):
+   ```javascript
+   window.open(`https://wa.me/56945802810?text=${msg}`, "_blank");
+   ```
+
+El formato del número es **código de país sin + seguido del número**, sin espacios. Para Chile: `56` + número sin el 0 inicial.
+
+---
+
+## 10. Cómo cambiar la ubicación del mapa
+
+En `index.html`, sección `#contacto`:
+
+```html
+<iframe src="https://www.google.com/maps?q=San+Marcos+1801+Padre+Hurtado&output=embed">
+```
+
+Reemplaza `San+Marcos+1801+Padre+Hurtado` con la dirección que quieras (usa `+` en lugar de espacios).
+
+---
+
+## 11. Cómo funciona el carrito y el checkout
+
+El carrito **no se guarda en Firestore** — vive en la variable `cart` en memoria RAM. Esto es intencional: si el usuario cierra la página, el carrito se vacía (comportamiento estándar de e-commerce sin login).
+
+Al hacer clic en **CONTINUAR**, la función `checkout()` en `app.js` construye un mensaje de WhatsApp con el detalle del pedido y abre WhatsApp en una nueva pestaña.
+
+Para persistir el carrito entre sesiones (sin Firebase), podrías reemplazar `let cart = []` por:
+
+```javascript
+let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+```
+
+Y al final de `updateCart()`, agregar:
+
+```javascript
+localStorage.setItem("cart", JSON.stringify(cart));
+```
+
+---
+
+## 12. Imágenes: formatos aceptados
+
+El sistema acepta **hasta 8 imágenes por producto** en dos formatos:
+
+| Formato | Cómo usarlo | Límite |
+|---------|-------------|--------|
+| **URL externa** | Pega el link directo de la imagen (ej: `https://i.imgur.com/foto.jpg`) | Sin límite de tamaño en Firestore |
+| **Archivo local** | Usa el campo `<input type="file">` del panel admin | Se convierte a Base64; máximo recomendado: 1MB por imagen (Firestore tiene límite de 1MB por documento) |
+
+**Recomendación:** usa URLs externas (Imgur, Cloudinary, Firebase Storage) para imágenes grandes. El Base64 infla el tamaño del documento en Firestore.
+
+---
+
+## 13. Funciones clave de app.js y qué reemplaza a qué
+
+| Función nueva (Firebase) | Equivalente anterior (localStorage) | Qué hace |
+|--------------------------|--------------------------------------|----------|
+| `guardarCatalogo(lista)` | `localStorage.setItem(...)` | Guarda el array completo en Firestore |
+| `onSnapshot(ref, cb)`    | `JSON.parse(localStorage.getItem(...))` | Lee datos en tiempo real |
+| `initApp()`              | Carga directa al hacer DOMContentLoaded | Espera Firebase y suscribe el listener |
+| `deleteProduct(id)`      | `db.productos.filter(...)` + `saveDB()` | Filtra y guarda en Firestore |
+| `addProduct()`           | `db.productos.push(...)` + `saveDB()` | Agrega o edita y guarda en Firestore |
+| `editProduct(id)`        | No existía | Carga datos al formulario para editar |
+| `renderAdminList()`      | `updateAdminTable()` | Pinta la lista de productos en el panel admin |
+| `setFirebaseStatus(msg)` | No existía | Muestra el estado de conexión en el panel admin |
+
+---
+
+## 14. Clases CSS importantes: no las cambies de nombre
+
+Estas clases son referenciadas directamente por `app.js` o son cruciales para el layout:
+
+| Clase CSS | Dónde se usa en JS | Qué hace |
+|-----------|-------------------|----------|
+| `#product-grid` | `renderProducts()` | Contenedor de tarjetas de productos |
+| `#cart-items` | `updateCart()` | Lista de ítems del carrito |
+| `#cart-count` | `updateCart()` | Contador en el ícono del carrito |
+| `#cart-total` | `updateCart()` | Total del carrito |
+| `#admin-list` | `renderAdminList()` | Lista de productos en el panel admin |
+| `#admin-save-btn` | `addProduct()` | Botón guardar del admin (se deshabilita mientras guarda) |
+| `#firebase-status` | `setFirebaseStatus()` | Indicador de conexión |
+| `.page-section` | `showSection()` | Todas las secciones navegables |
+| `.active` (en `.cart-sidebar`) | `toggleCart()` | Abre/cierra el carrito |
+| `.active` (en `.admin-overlay`) | `toggleAdmin()` | Abre/cierra el panel admin |
+| `.active` (en `.product-modal-overlay`) | `openModal()` / `closeModal()` | Abre/cierra el modal de producto |
+
+---
+
+## 15. Configuración de Firebase: qué es cada credencial
+
+```javascript
+const firebaseConfig = {
+    apiKey:            "...",  // Clave de la API web (NO es secreta; Firebase la protege con reglas)
+    authDomain:        "...",  // Dominio para OAuth (login con Google, si lo añades después)
+    projectId:         "...",  // ID único de tu proyecto en Firebase
+    storageBucket:     "...",  // Bucket de Firebase Storage (para subir archivos grandes)
+    messagingSenderId: "...",  // ID para Firebase Cloud Messaging (notificaciones push)
+    appId:             "...",  // ID de tu app web específica dentro del proyecto
+    measurementId:     "..."   // ID de Google Analytics (opcional; bórralo si no lo usas)
+};
+```
+
+**¿Es seguro exponer estas credenciales?**  
+Sí, es el comportamiento esperado con Firebase. La seguridad real se configura en las **Reglas de Firestore** (ver sección 16), no ocultando las credenciales.
+
+---
+
+## 16. Reglas de seguridad sugeridas en Firestore
+
+Ve a **Firebase Console → Firestore → Reglas** y pega:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // El catálogo es público para lectura
+    match /tienda/catalogo {
+      allow read: if true;
+
+      // Solo escritura si la petición viene con la contraseña en el header
+      // (Para una app sin backend, usa esto solo en modo desarrollo)
+      allow write: if true;
+    }
+  }
+}
+```
+
+**Para producción real**, cuando tengas Firebase Authentication implementado:
+
+```
+allow write: if request.auth != null && request.auth.token.admin == true;
+```
+
+---
+
+## 17. Qué NO debes modificar
+
+| Archivo / Elemento | Por qué no modificarlo |
+|--------------------|------------------------|
+| El `<script type="module">` en `index.html` | Es la inicialización de Firebase; si lo rompes, nada funciona |
+| El evento `"firebase-ready"` | Es el puente entre el módulo de Firebase y `app.js` |
+| Los `id` HTML de las secciones (`inicio`, `productos`, `contacto`, etc.) | `showSection()` los busca por ese nombre exacto |
+| La estructura del documento Firestore (`tienda/catalogo`) | `initApp()` apunta exactamente a esa ruta |
+| Los nombres de las propiedades del objeto producto (`id`, `nombre`, `precio`, `cat`, `subcat`, `img`, `imgs`, `desc`) | Todo el render y los filtros dependen de esos nombres |
+
+---
+
+## 18. Preguntas frecuentes (FAQ)
+
+**¿Por qué los productos no aparecen al cargar?**  
+Espera 1–2 segundos. Firebase necesita tiempo para conectarse. Si el problema persiste, revisa la consola del navegador (F12) para ver errores de Firestore.
+
+**¿Puedo tener más de un administrador?**  
+Con el sistema actual, no (es una sola contraseña). Para múltiples admins, implementa Firebase Authentication con roles.
+
+**¿Cómo hago backup de mis productos?**  
+Ve a Firebase Console → Firestore → `tienda/catalogo` → copia el JSON del campo `productos`.
+
+**¿Qué pasa si supero el límite gratuito de Firestore?**  
+El plan gratuito (Spark) incluye 50.000 lecturas/día y 20.000 escrituras/día. Para una tienda pequeña es más que suficiente.
+
+**¿Cómo agrego imágenes desde mi computador sin que sean Base64?**  
+Usa **Firebase Storage**: sube la imagen con `uploadBytes()` y guarda la URL con `getDownloadURL()`. Requiere activar Storage en tu proyecto Firebase.
+
+**¿Puedo renombrar `tienda/catalogo` por otra ruta en Firestore?**  
+Sí, cambia esta línea en `app.js` (y en `guardarCatalogo`):
+```javascript
+doc(window.db_cloud, "tienda", "catalogo")
+// por ejemplo:
+doc(window.db_cloud, "miTienda", "productos")
+```
+
+**¿Cómo agrego una nueva sección (ej: "Blog")?**  
+1. Añade un `<section id="blog" class="page-section">` en `index.html`.
+2. Añade un `<li>` con `onclick="showSection('blog')"` en el navbar.
+3. Listo. `showSection()` lo manejará automáticamente.
+
+---
+
+> **Nota:** Este proyecto es para fines de portafolio y tiendas pequeñas. Para un e-commerce con pagos reales, se recomienda integrar Transbank (Chile), MercadoPago, o Stripe con un backend seguro (Next.js + Firebase Functions).
