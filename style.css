@@ -49,7 +49,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg-main); color: var
 /* ======= +18 GATE ======= */
 .gate-overlay {
   position: fixed; inset: 0; z-index: 9999;
-  background: rgba(5,10,6,.97);
+  background: rgba(8, 16, 9, 0.863);
   display: flex; align-items: center; justify-content: center;
   padding: 24px;
 }
@@ -93,7 +93,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg-main); color: var
 @keyframes scrollTicker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 .top-logo-wrapper { display: flex; justify-content: center; padding: 15px 0; background: transparent; position: absolute; width: 100%; top: 40px; z-index: 1001; pointer-events: none; }
-.pina-logo-main { font-size: 1.7rem; font-weight: 900; color: #000000; text-shadow: 0 0 12px rgba(237, 250, 0, 0.8), 0 0 22px rgba(0,229,255,0.4); letter-spacing: 1px; pointer-events: auto; }
+.pina-logo-main { font-size: 1.7rem; font-weight: 900; color: #00000080; text-shadow: 0 0 12px rgba(255, 255, 255, 0.8), 0 0 22px rgb(255, 255, 255); letter-spacing: 3px; pointer-events: auto; }
 .main-top-logo { width: 90px; height: auto; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1)); pointer-events: auto; }
 
 /* 3. NAVBAR NEGRA + SIRENA AZUL */
@@ -106,22 +106,22 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg-main); color: var
     top: 0;
     z-index: 1100;
     margin-top: 50px;
-    background: #080808;
+    background: #000000;
     border-radius: 20px;
-    border: 1px solid rgba(0, 200, 255, 0.12);
+    border: 1px solid rgb(132, 255, 1);
     box-shadow: 0 4px 30px rgba(0,0,0,0.5);
     overflow: hidden;
-    animation: navbarBorderGlow 4s ease-in-out infinite;
+    animation: navbarBorderGlow 1s ease-in-out infinite;
 }
 
 @keyframes navbarBorderGlow {
     0%, 100% {
         border-color: rgba(38, 255, 0, 0.12);
-        box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        box-shadow: 0 4px 30px rgba(170, 231, 28, 0.5);
     }
-    50% {
-        border-color: rgba(51, 255, 0, 0.55);
-        box-shadow: 0 4px 40px rgba(60, 255, 0, 0.35);
+    30% {
+        border-color: rgba(38, 183, 2, 0.55);
+        box-shadow: 0 4px 40px rgb(255, 255, 255);
     }
 }
 
@@ -140,10 +140,6 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg-main); color: var
         rgba(174, 230, 0, 0.08) 80%,
         transparent 100%
     );
-    filter: blur(6px);
-    animation: sirenSweep 9s ease-in-out infinite;
-    pointer-events: none;
-    border-radius: 0;
 }
 
 @keyframes sirenSweep {
@@ -184,7 +180,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg-main); color: var
 
 /* BOTONES GLOBALES */
 .btn-green-glow { background: linear-gradient(135deg, var(--lime-fluor), var(--green-emerald)); color: var(--text-dark); border: none; padding: 12px 28px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 900; cursor: pointer; transition: 0.3s; box-shadow: var(--glow-green); text-transform: uppercase; letter-spacing: 0.5px; }
-.btn-green-glow:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 25px rgba(174, 230, 0, 0.4); }
+.btn-green-glow:hover { transform: translateY(5px) scale(1.00); box-shadow: 0 12px 25px rgba(174, 230, 0, 0.4); }
 .large-btn { font-size: 1.1rem; padding: 15px 40px; }
 .full-width { width: 100%; }
 
