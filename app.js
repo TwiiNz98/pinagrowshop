@@ -7,7 +7,7 @@
 // ──────────────────────────────────────────────────────────────
 // 1.  CONSTANTES Y ESTADO GLOBAL
 // ──────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD = "Pineapple2026";   // ← cambia aquí si quieres otra clave
+const ADMIN_PASSWORD = "Pineapple420";   // ← cambia aquí si quieres otra clave
 
 const CATEGORIAS = {
     "Smoke":      ["Pipas", "Bongs", "Papelillos", "Enroladores", "Limpieza"],
