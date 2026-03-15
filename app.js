@@ -7,7 +7,7 @@
 // ──────────────────────────────────────────────────────────────
 // 1.  CONSTANTES Y ESTADO GLOBAL
 // ──────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD = "pina2026";   // ← cambia aquí si quieres otra clave
+const ADMIN_PASSWORD = "Pineapple2026";   // ← cambia aquí si quieres otra clave
 
 const CATEGORIAS = {
     "Smoke":      ["Pipas", "Bongs", "Papelillos", "Enroladores", "Limpieza"],
@@ -49,7 +49,7 @@ function initApp() {
     // ── onSnapshot: escucha cambios en tiempo real ──
     onSnapshot(catalogoRef,
         (docSnap) => {
-            setFirebaseStatus("✅ Conectado con Firestore", "green");
+            setFirebaseStatus("✅ Estado : Actualizado.", "green");
 
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -66,7 +66,7 @@ function initApp() {
         },
         (error) => {
             console.error("Error Firestore:", error);
-            setFirebaseStatus("❌ Sin conexión a Firestore", "red");
+            setFirebaseStatus("❌ No fue posible conectarse a Firestone.", "red");
             // Fallback: mostrar igual si hay algo en catalogoGlobal
             renderProducts();
         }
