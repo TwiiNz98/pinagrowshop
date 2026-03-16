@@ -6,10 +6,18 @@ style.css — Piña GrowShop | Design System Premium
 :root {
 / Fondos */
 --bg-main: #f9fbf9;
---bg-card: #ffffff;
+--bg-card: #ffffff; 
 
-/* Texto */ --text-dark: #1a231a; --text-muted: #667a66; /* Verdes */ --lime-fluor: #aee600; --lime-dark: #82b300; --green: #4caf50; --green-dark: #2e7d32; --green-emerald: #4caf50; /* Amarillos */ --yellow: #fdd835; --yellow-light: #fff176; /* Acento */ --orange: #fb8c00; /* Brillos (box-shadow) */ --glow-green: 0 5px 20px rgba(76, 175, 80, 0.35); --glow-lime: 0 0 18px rgba(174, 230, 0, 0.65); /* Bordes */ --border: rgba(76, 175, 80, .18); --border-h: rgba(76, 175, 80, .45); /* Radios */ --radius: 20px; --pill: 50px; /* Sombra genérica */ --shadow: 0 8px 40px rgba(0, 0, 0, .10); /* Transición global */ --t: all .38s cubic-bezier(.23, 1, .32, 1); 
+/* Texto */
+--text-dark: #1a231a;
+--text-muted: #667a66;
 
+/* Verdes */
+--lime-fluor: #aee600;
+--lime-dark: #82b300;
+--green: #4caf50;
+--green-dark: #2e7d32;
+--green-emerald: #4caf50;
 }
 
 /* ── 2. RESET & BASE ── */
@@ -23,6 +31,9 @@ background: var(--bg-main);
 color: var(--text-dark);
 overflow-x: hidden;
 line-height: 1.6;
+
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
 }
 
 img { max-width: 100%; display: block; }
