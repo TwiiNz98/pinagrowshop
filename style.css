@@ -22,6 +22,24 @@ style.css — Piña GrowShop | Design System Premium
 /* Amarillos */
 --yellow: #fdd835;
 --yellow-light: #fff176;
+
+/* Bordes */
+--border: rgba(76,175,80,.18);
+--border-h: rgba(76,175,80,.45);
+
+/* Radios */
+--radius: 20px;
+--pill: 50px;
+
+/* Sombras */
+--shadow: 0 8px 40px rgba(0,0,0,.10);
+
+/* Brillos */
+--glow-green: 0 5px 20px rgba(76,175,80,.35);
+--glow-lime: 0 0 18px rgba(174,230,0,.65);
+
+/* Transición */
+--t: all .38s cubic-bezier(.23,1,.32,1);
 }
 
 /* ── 2. RESET & BASE ── */
