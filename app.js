@@ -32,6 +32,7 @@ let modalProducto   = null; // producto abierto en el modal
 let modalQty        = 1;
 let editingId       = null; // si está editando un producto existente
 let adminFilesB64   = [];   // imágenes cargadas localmente como base64
+let cartLeafInterval = null;
 
 // ──────────────────────────────────────────────────────────────
 // 2.  INICIALIZACIÓN — espera a que Firebase esté disponible
@@ -485,6 +486,8 @@ function toggleSocialMenu(event) {
 function attachNavbarMouseGlow() {
     const navbar = document.getElementById("navbar-main");
     if (!navbar) return;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
     navbar.addEventListener("mousemove", (event) => {
         const rect = navbar.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * 100;
@@ -492,19 +495,25 @@ function attachNavbarMouseGlow() {
         navbar.style.setProperty("--mouse-x", `${Math.max(0, Math.min(100, x))}%`);
         navbar.style.setProperty("--mouse-y", `${Math.max(0, Math.min(100, y))}%`);
     });
+    navbar.addEventListener("mouseleave", () => {
+        navbar.style.setProperty("--mouse-x", "50%");
+        navbar.style.setProperty("--mouse-y", "50%");
+    });
 }
 
 function triggerCartLeafRain() {
     const rainZone = document.getElementById("cart-leaf-rain");
     if (!rainZone) return;
+    if (cartLeafInterval) clearInterval(cartLeafInterval);
     rainZone.innerHTML = "";
 
     const symbols = ["🍃", "🌿", "🍃", "🌿"];
     const start = Date.now();
 
-    const interval = setInterval(() => {
+    cartLeafInterval = setInterval(() => {
         if (Date.now() - start > 3000) {
-            clearInterval(interval);
+            clearInterval(cartLeafInterval);
+            cartLeafInterval = null;
             return;
         }
         const leaf = document.createElement("span");
@@ -552,6 +561,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const toggle = document.querySelector(".social-toggle");
         if (!menu || !toggle) return;
         if (menu.contains(event.target)) return;
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
+        const menu = document.getElementById("social-dropdown");
+        const toggle = document.querySelector(".social-toggle");
+        if (!menu || !toggle) return;
         menu.classList.remove("open");
         toggle.setAttribute("aria-expanded", "false");
     });

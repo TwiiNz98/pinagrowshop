@@ -4,7 +4,7 @@ style.css — Piña GrowShop | Design System Premium
 
 /* ── 1. TOKENS DE DISEÑO (CSS Variables) ── */
 :root {
-/ Fondos */
+/* Fondos */
 --bg-main: #f9fbf9;
 --bg-card: #ffffff;
 
@@ -744,4 +744,15 @@ animation: slide-in .25s ease;
 .product-grid { grid-template-columns: 1fr 1fr; }
 .footer-grid { grid-template-columns: 1fr; }
 .services-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+*,
+*::before,
+*::after {
+animation-duration: .01ms !important;
+animation-iteration-count: 1 !important;
+transition-duration: .01ms !important;
+scroll-behavior: auto !important;
+}
 }
