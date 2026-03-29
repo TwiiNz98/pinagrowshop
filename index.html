@@ -75,7 +75,16 @@
 
     <header>
         <nav class="navbar">
-            <div class="siren-light"></div>
+            <div class="social-dropdown" id="social-dropdown">
+                <button class="social-toggle" onclick="toggleSocialMenu(event)" aria-label="Abrir redes sociales" aria-expanded="false">
+                    <span class="social-dot"></span>
+                    <span class="social-text">Redes</span>
+                </button>
+                <div class="social-menu" id="social-menu">
+                    <a href="https://www.instagram.com/pinagrowshop/" target="_blank" rel="noreferrer">Instagram</a>
+                    <a href="https://www.facebook.com/Pineapple420Grow/" target="_blank" rel="noreferrer">Facebook</a>
+                </div>
+            </div>
             <div class="mobile-menu-icon" onclick="toggleMobileMenu()">☰</div>
 
             <ul class="nav-links" id="main-nav-links">

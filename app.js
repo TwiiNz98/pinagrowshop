@@ -466,6 +466,16 @@ function toggleMobileMenu() {
     document.getElementById("main-nav-links")?.classList.toggle("open");
 }
 
+
+function toggleSocialMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById("social-dropdown");
+    const btn  = event.currentTarget;
+    if (!menu || !btn) return;
+    menu.classList.toggle("open");
+    btn.setAttribute("aria-expanded", String(menu.classList.contains("open")));
+}
+
 function showToast(msg) {
     const t = document.createElement("div");
     t.className  = "toast-msg";
@@ -492,6 +502,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("gate-yes")?.addEventListener("click", closeGate);
     document.getElementById("gate-no")?.addEventListener("click",  () => {
         window.location.href = "https://www.google.com";
+    });
+
+    document.addEventListener("click", (event) => {
+        const menu = document.getElementById("social-dropdown");
+        const toggle = document.querySelector(".social-toggle");
+        if (!menu || !toggle) return;
+        if (menu.contains(event.target)) return;
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
     });
 
     // Mostrar sección inicio por defecto
