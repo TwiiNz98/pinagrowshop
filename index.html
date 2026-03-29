@@ -67,15 +67,25 @@
     </div>
 
     <div class="top-logo-wrapper">
-        <div class="pina-logo-main">
+        <div class="pina-logo-main logo-fluor-authority">
             <span class="logo-pina">Piña</span>
             <span class="logo-growshop">Growshop</span>
         </div>
     </div>
 
     <header>
-        <nav class="navbar">
-            <div class="siren-light"></div>
+        <nav class="navbar" id="navbar-main">
+            <div class="navbar-particles" aria-hidden="true"></div>
+            <div class="social-dropdown" id="social-dropdown">
+                <button class="social-toggle" onclick="toggleSocialMenu(event)" aria-label="Abrir redes sociales" aria-expanded="false">
+                    <span class="social-dot"></span>
+                    <span class="social-text">Redes</span>
+                </button>
+                <div class="social-menu" id="social-menu">
+                    <a href="https://www.instagram.com/pinagrowshop/" target="_blank" rel="noreferrer">Instagram</a>
+                    <a href="https://www.facebook.com/Pineapple420Grow/" target="_blank" rel="noreferrer">Facebook</a>
+                </div>
+            </div>
             <div class="mobile-menu-icon" onclick="toggleMobileMenu()">☰</div>
 
             <ul class="nav-links" id="main-nav-links">
@@ -284,8 +294,9 @@
 
     <!-- ===== CARRITO LATERAL ===== -->
     <div id="cart-sidebar" class="cart-sidebar glass-light">
+        <div class="cart-leaf-rain" id="cart-leaf-rain" aria-hidden="true"></div>
         <div class="cart-header">
-            <h3 class="fredoka-title text-dark">Carrito de Compras</h3>
+            <h3 class="fredoka-title text-dark cart-title-glow">Carrito de Compras</h3>
             <button class="btn-close-naked text-dark" onclick="toggleCart()">✕</button>
         </div>
         <div id="cart-items" class="cart-items-container"></div>
@@ -293,7 +304,7 @@
             <div class="total-row fredoka-title text-lime-dark">
                 Total: <span id="cart-total">$0</span>
             </div>
-            <button class="btn-green-glow full-width" onclick="checkout()">CONTINUAR</button>
+            <button class="btn-green-glow full-width cart-continue-btn" onclick="checkout()">CONTINUAR</button>
         </div>
     </div>
 

@@ -459,11 +459,64 @@ function showSection(id) {
 }
 
 function toggleCart() {
-    document.getElementById("cart-sidebar").classList.toggle("active");
+    const cartSidebar = document.getElementById("cart-sidebar");
+    if (!cartSidebar) return;
+    const isOpening = !cartSidebar.classList.contains("active");
+    cartSidebar.classList.toggle("active");
+    if (isOpening) {
+        triggerCartLeafRain();
+    }
 }
 
 function toggleMobileMenu() {
     document.getElementById("main-nav-links")?.classList.toggle("open");
+}
+
+
+function toggleSocialMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById("social-dropdown");
+    const btn  = event.currentTarget;
+    if (!menu || !btn) return;
+    menu.classList.toggle("open");
+    btn.setAttribute("aria-expanded", String(menu.classList.contains("open")));
+}
+
+function attachNavbarMouseGlow() {
+    const navbar = document.getElementById("navbar-main");
+    if (!navbar) return;
+    navbar.addEventListener("mousemove", (event) => {
+        const rect = navbar.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = ((event.clientY - rect.top) / rect.height) * 100;
+        navbar.style.setProperty("--mouse-x", `${Math.max(0, Math.min(100, x))}%`);
+        navbar.style.setProperty("--mouse-y", `${Math.max(0, Math.min(100, y))}%`);
+    });
+}
+
+function triggerCartLeafRain() {
+    const rainZone = document.getElementById("cart-leaf-rain");
+    if (!rainZone) return;
+    rainZone.innerHTML = "";
+
+    const symbols = ["🍃", "🌿", "🍃", "🌿"];
+    const start = Date.now();
+
+    const interval = setInterval(() => {
+        if (Date.now() - start > 3000) {
+            clearInterval(interval);
+            return;
+        }
+        const leaf = document.createElement("span");
+        leaf.className = "leaf";
+        leaf.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        leaf.style.left = `${Math.floor(Math.random() * 12)}px`;
+        leaf.style.setProperty("--leaf-x", `${6 + Math.random() * 18}px`);
+        leaf.style.setProperty("--leaf-rot", `${120 + Math.random() * 320}deg`);
+        leaf.style.animationDuration = `${1.7 + Math.random() * 1.6}s`;
+        rainZone.appendChild(leaf);
+        setTimeout(() => leaf.remove(), 3600);
+    }, 90);
 }
 
 function showToast(msg) {
@@ -493,6 +546,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("gate-no")?.addEventListener("click",  () => {
         window.location.href = "https://www.google.com";
     });
+
+    document.addEventListener("click", (event) => {
+        const menu = document.getElementById("social-dropdown");
+        const toggle = document.querySelector(".social-toggle");
+        if (!menu || !toggle) return;
+        if (menu.contains(event.target)) return;
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+    });
+
+    attachNavbarMouseGlow();
 
     // Mostrar sección inicio por defecto
     showSection("inicio");
